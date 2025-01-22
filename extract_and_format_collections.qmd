@@ -1,0 +1,58 @@
+---
+title: "Extract and format HAL collections"
+format: html
+editor: visual
+---
+
+```{r setup}
+library(HALtere)
+collections=c("BIOEENVIS","EVS_UMR5600","OSR","PEPR_ONEWATER")
+
+```
+
+# Extract data
+
+```{r}
+for(collection in collections){
+  datadir=glue::glue("data/{collection}")
+  dir.create(datadir,showWarnings = FALSE)
+  publications=extract_collection(collection)
+  saveRDS(publications,glue::glue("{datadir}/publications.RDS"))
+}
+
+for(collection in collections){
+  datadir=glue::glue("data/{collection}")
+  publications=readRDS(glue::glue("{datadir}/publications.RDS"))
+  data_authors=tidy_authors(publications)
+  saveRDS(data_authors,glue::glue("{datadir}/data_authors.RDS"))
+}
+
+for(collection in collections){
+  datadir=glue::glue("data/{collection}")
+  data_authors=readRDS(glue::glue("{datadir}/data_authors.RDS"))
+  crossed_auth=HALtere::cross(data=data_authors, var_to_cross="name", var_grouping="id_ref") 
+  saveRDS(crossed_auth,glue::glue("{datadir}/crossed_authors.RDS"))
+  crossed_aff=HALtere::cross(data=data_authors, var_to_cross="affiliation", var_grouping="id_ref")
+  saveRDS(crossed_aff,glue::glue("{datadir}/crossed_affiliations.RDS"))
+}
+
+
+```
+
+```{r}
+plot_network(crossed_auth,number_of_nodes=100, number_of_names=20,sizevar=nrefs,colorvar=affiliation)
+```
+
+
+```{r}
+plot_network(crossed_aff,number_of_nodes=100,number_of_names=10,sizevar=nrefs)
+```
+
+<!-- library(tidygraph) -->
+<!-- library(ggraph) -->
+<!-- g=tidygraph::as_tbl_graph(cross_aff %>% filter(n>50)) -->
+<!-- ggraph(g, layout = "fr") + -->
+<!--   geom_edge_link(aes(edge_alpha = n), show.legend = FALSE) + -->
+<!--   geom_node_point(color = "lightblue", size = 5) + -->
+<!--   geom_node_text(aes(label = name), repel = TRUE) + -->
+<!--   theme_void() -->
