@@ -6,10 +6,10 @@ editor: visual
 
 ```{r setup}
 library(HALtere)
-collections=c("BIOEENVIS","EVS_UMR5600","OSR","PEPR_ONEWATER")
-
+collections=c("BIOEENVIS","EVS_UMR5600","OSR","PEPR_ONEWATER","LEHNA")
 ```
 
+ 
 # Extract data
 
 ```{r}
@@ -19,40 +19,49 @@ for(collection in collections){
   publications=extract_collection(collection)
   saveRDS(publications,glue::glue("{datadir}/publications.RDS"))
 }
+```
 
+# Extract data_authors
+
+
+```{r}
 for(collection in collections){
   datadir=glue::glue("data/{collection}")
   publications=readRDS(glue::glue("{datadir}/publications.RDS"))
+  data_ref_authors=tidy_ref_authors(publications)
   data_authors=tidy_authors(publications)
+  
+  saveRDS(data_ref_authors,glue::glue("{datadir}/data_ref_authors.RDS"))
   saveRDS(data_authors,glue::glue("{datadir}/data_authors.RDS"))
 }
+```
 
+# Extract crossed data
+
+```{r}
 for(collection in collections){
   datadir=glue::glue("data/{collection}")
+  data_ref_authors=readRDS(glue::glue("{datadir}/data_ref_authors.RDS"))
   data_authors=readRDS(glue::glue("{datadir}/data_authors.RDS"))
-  crossed_auth=HALtere::cross(data=data_authors, var_to_cross="name", var_grouping="id_ref") 
+  crossed_auth=HALtere::cross(data_by_ref=data_ref_authors,
+                              data_by_structure=data_authors,
+                              var_to_cross="name") 
   saveRDS(crossed_auth,glue::glue("{datadir}/crossed_authors.RDS"))
-  crossed_aff=HALtere::cross(data=data_authors, var_to_cross="affiliation", var_grouping="id_ref")
+  crossed_aff=HALtere::cross(data_by_ref=data_ref_authors,
+                             data_by_structure=data_authors,
+                             var_to_cross="affiliation")
   saveRDS(crossed_aff,glue::glue("{datadir}/crossed_affiliations.RDS"))
 }
-
-
 ```
 
+# Extract text_title
 ```{r}
-plot_network(crossed_auth,number_of_nodes=100, number_of_names=20,sizevar=nrefs,colorvar=affiliation)
+for(collection in collections){
+  datadir=glue::glue("data/{collection}")
+  publications=readRDS(glue::glue("{datadir}/publications.RDS"))
+  text_title=tidy_text(publications,"title_en")
+  saveRDS(text_title,
+          glue::glue("{datadir}/text_title.RDS"))
+}
 ```
 
-
-```{r}
-plot_network(crossed_aff,number_of_nodes=100,number_of_names=10,sizevar=nrefs)
-```
-
-<!-- library(tidygraph) -->
-<!-- library(ggraph) -->
-<!-- g=tidygraph::as_tbl_graph(cross_aff %>% filter(n>50)) -->
-<!-- ggraph(g, layout = "fr") + -->
-<!--   geom_edge_link(aes(edge_alpha = n), show.legend = FALSE) + -->
-<!--   geom_node_point(color = "lightblue", size = 5) + -->
-<!--   geom_node_text(aes(label = name), repel = TRUE) + -->
-<!--   theme_void() -->
