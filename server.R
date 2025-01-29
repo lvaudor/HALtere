@@ -45,10 +45,18 @@ function(input, output, session) {
     graph=r_get_graph()
     plot_network(graph,
                  number_of_names=input$number_of_names,
+                 namevar=input$namevar,
                  sizevar=input$sizevar,
                  colorvar=input$colorvar)
   })
-
+  output$table_nodes <- DT::renderDT({
+    graph=r_get_graph()
+    graph$nodes
+  })
+  output$table_edges <- DT::renderDT({
+    graph=r_get_graph()
+    graph$edges
+  })
   r_get_text=reactive({
     collection=input$collection
     years=input$years
@@ -82,11 +90,11 @@ function(input, output, session) {
     updateSliderInput(session,"number_of_nodes",
                       min=0,
                       max=max_number_of_names,
-                      value=min(c(100,max_number_of_names)))
+                      value=min(c(400,max_number_of_names)))
     updateSliderInput(session,"number_of_names",
                       min=0,
                       max=max_number_of_names,
-                      value=min(c(20,max_number_of_names)))
+                      value=min(c(50,max_number_of_names)))
   })
 
 }

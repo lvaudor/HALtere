@@ -39,19 +39,22 @@ fluidPage(
                selectInput("sizevar",
                            "Size nodes according to:",
                            choices=c("nrefs")),
+               selectInput("namevar",
+                           "Display labels corresponding to:",
+                           choices=c("name","affiliation","lemma")),
                selectInput("colorvar",
                            "Color nodes according to:",
                            choices=c("affiliation","name")),
                sliderInput("number_of_nodes",
                            "Number of nodes to display:",
                            min=0,
-                           max=100,
-                           value=100),
+                           max=400,
+                           value=400),
                sliderInput("number_of_names",
                            "Number of names to display:",
                            min=0,
                            max=50,
-                           value=20),
+                           value=50),
                radioButtons("doctype",
                             "Type of document",
                             c("articles only","all documents"))
@@ -59,9 +62,16 @@ fluidPage(
 
         # Show a plot of the generated distribution
         column(width=10,
-               plotly::plotlyOutput("collab_graph",
+               tabsetPanel(
+                  tabPanel("graph",
+                           plotly::plotlyOutput("collab_graph",
                                     width = "100%",
-                                    height = "600px",)
+                                    height = "800px")),
+                  tabPanel("nodes",
+                           DT::dataTableOutput("table_nodes")),
+                  tabPanel("links",
+                           DT::dataTableOutput("table_edges"))
+               )#tabsetPanel
         )
       )
     ),# tabPanel collaborations

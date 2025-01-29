@@ -7,9 +7,9 @@ editor: visual
 ```{r setup}
 library(HALtere)
 collections=c("BIOEENVIS","EVS_UMR5600","OSR","PEPR_ONEWATER","LEHNA")
+#collections="EVS_UMR5600"
 ```
 
- 
 # Extract data
 
 ```{r}
@@ -22,7 +22,6 @@ for(collection in collections){
 ```
 
 # Extract data_authors
-
 
 ```{r}
 for(collection in collections){
@@ -55,13 +54,13 @@ for(collection in collections){
 ```
 
 # Extract text_title
+
 ```{r}
 for(collection in collections){
   datadir=glue::glue("data/{collection}")
   publications=readRDS(glue::glue("{datadir}/publications.RDS"))
-  text_title=tidy_text(publications,"title_en")
+  text_title=tidy_text(publications,"text")
   saveRDS(text_title,
-          glue::glue("{datadir}/text_title.RDS"))
+          glue::glue("{datadir}/text.RDS"))
 }
 ```
-
