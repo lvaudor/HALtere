@@ -12,20 +12,21 @@ library(shiny)
 # Define server logic required to draw a histogram
 function(input, output, session) {
 
-  r_get_data_authors=reactive({
+  r_get_data_groups=reactive({
     input$collection
     datadir=glue::glue("data/{input$collection}")
-    data_authors=readRDS(glue::glue("{datadir}/data_authors.RDS")) %>%
+    groups=input$groups
+    data_groups=readRDS(glue::glue("{datadir}/data_{groups}.RDS")) %>%
       dplyr::filter(producedDateY_i>=input$years[1] & producedDateY_i<=input$years[2])
   })
   r_get_data_crossed=reactive({
     input$collection
     input$years
     input$doctype
-    input$ind
-    if(input$ind=="people"){ind="authors"}else{ind="affiliations"}
+    groups=input$groups
     datadir=glue::glue("data/{input$collection}")
-    data_crossed=readRDS(glue::glue("{datadir}/crossed_{ind}.RDS")) %>%
+
+    data_crossed=readRDS(glue::glue("{datadir}/crossed_{groups}.RDS")) %>%
       dplyr::filter(producedDateY_i>=input$years[1] & producedDateY_i<=input$years[2])
     if(input$doctype=="ART"){
       data_crossed=data_crossed %>%
@@ -35,10 +36,10 @@ function(input, output, session) {
   })
 
   r_get_graph=reactive({
-    crossed_auth=r_get_data_crossed()
-    data_auth=r_get_data_authors()
-    build_network(crossed_auth,
-                  data_auth,
+    data_crossed=r_get_data_crossed()
+    data_groups=r_get_data_groups()
+    build_network(data_crossed=data_crossed,
+                  data_groups=data_groups,
                   number_of_nodes=input$number_of_nodes)
   })
   output$collab_graph<- plotly::renderPlotly({
@@ -60,7 +61,8 @@ function(input, output, session) {
   r_get_text=reactive({
     collection=input$collection
     years=input$years
-    data=readRDS(glue::glue("data/{collection}/text_title.RDS")) %>%
+
+    data=readRDS(glue::glue("data/{collection}/text.RDS")) %>%
       dplyr::filter(producedDateY_i>=input$years[1],
                     producedDateY_i<=input$years[2]) %>%
       na.omit()
@@ -84,9 +86,8 @@ function(input, output, session) {
                       max=range_years[2],
                       value=range_years)
   })
-  observeEvent(input$ind,{
-    var=rlang::sym(switch(input$ind=="people","name","affiliation"))
-    max_number_of_names=r_get_data_authors() %>% dplyr::pull(var) %>% unique() %>% length()
+  observeEvent(input$groups,{
+    max_number_of_names=r_get_data_groups() %>% dplyr::pull(name) %>% unique() %>% length()
     updateSliderInput(session,"number_of_nodes",
                       min=0,
                       max=max_number_of_names,

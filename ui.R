@@ -18,7 +18,7 @@ fluidPage(
            column(width=3,
                   selectInput("collection",
                               "Collection:",
-                              c("BIOEENVIS","EVS_UMR5600","OSR","LEHNA"))),
+                              c("BIOEENVIS","EVS_UMR5600","OSR","LEHNA","ECOMIC"))),
            column(width=7,
                   "Exploration des collections HAL par les graphes de collaborations et les fréquences de mots")),
   tabsetPanel(
@@ -28,7 +28,7 @@ fluidPage(
       # Sidebar with a slider input for number of bins
       fluidRow(
         column(width=2,
-               selectInput("ind",
+               selectInput("groups",
                            "collaboration between:",
                            c("people","labs")),
                sliderInput("years",
@@ -63,14 +63,14 @@ fluidPage(
         # Show a plot of the generated distribution
         column(width=10,
                tabsetPanel(
-                  tabPanel("graph",
-                           plotly::plotlyOutput("collab_graph",
-                                    width = "100%",
-                                    height = "800px")),
-                  tabPanel("nodes",
-                           DT::dataTableOutput("table_nodes")),
-                  tabPanel("links",
-                           DT::dataTableOutput("table_edges"))
+                 tabPanel("graph",
+                          plotly::plotlyOutput("collab_graph",
+                                               width = "100%",
+                                               height = "800px")),
+                 tabPanel("nodes",
+                          DT::dataTableOutput("table_nodes")),
+                 tabPanel("links",
+                          DT::dataTableOutput("table_edges"))
                )#tabsetPanel
         )
       )

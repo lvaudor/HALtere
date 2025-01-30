@@ -6,8 +6,8 @@ editor: visual
 
 ```{r setup}
 library(HALtere)
-collections=c("BIOEENVIS","EVS_UMR5600","OSR","PEPR_ONEWATER","LEHNA")
-#collections="EVS_UMR5600"
+collections=c("BIOEENVIS","EVS_UMR5600","OSR","LEHNA","ECOMIC")#LBBE
+#collections="LBBE"
 ```
 
 # Extract data
@@ -21,17 +21,19 @@ for(collection in collections){
 }
 ```
 
-# Extract data_authors
+# Extract data_ref_authors, data_people, data_labs
 
 ```{r}
 for(collection in collections){
   datadir=glue::glue("data/{collection}")
   publications=readRDS(glue::glue("{datadir}/publications.RDS"))
   data_ref_authors=tidy_ref_authors(publications)
-  data_authors=tidy_authors(publications)
+  data_people=tidy_groups(data_ref_authors, type="people")
+  data_labs=tidy_groups(data_ref_authors, type="labs")
   
   saveRDS(data_ref_authors,glue::glue("{datadir}/data_ref_authors.RDS"))
-  saveRDS(data_authors,glue::glue("{datadir}/data_authors.RDS"))
+  saveRDS(data_people,glue::glue("{datadir}/data_people.RDS"))
+  saveRDS(data_labs,glue::glue("{datadir}/data_labs.RDS"))
 }
 ```
 
@@ -41,15 +43,12 @@ for(collection in collections){
 for(collection in collections){
   datadir=glue::glue("data/{collection}")
   data_ref_authors=readRDS(glue::glue("{datadir}/data_ref_authors.RDS"))
-  data_authors=readRDS(glue::glue("{datadir}/data_authors.RDS"))
-  crossed_auth=HALtere::cross(data_by_ref=data_ref_authors,
-                              data_by_structure=data_authors,
-                              var_to_cross="name") 
-  saveRDS(crossed_auth,glue::glue("{datadir}/crossed_authors.RDS"))
-  crossed_aff=HALtere::cross(data_by_ref=data_ref_authors,
-                             data_by_structure=data_authors,
-                             var_to_cross="affiliation")
-  saveRDS(crossed_aff,glue::glue("{datadir}/crossed_affiliations.RDS"))
+  data_people=readRDS(glue::glue("{datadir}/data_people.RDS"))
+  crossed_people=HALtere::cross(data_people,data_ref_authors)
+  data_labs=readRDS(glue::glue("{datadir}/data_labs.RDS"))
+  crossed_labs=HALtere::cross(data_labs,data_ref_authors)
+  saveRDS(crossed_people,glue::glue("{datadir}/crossed_people.RDS"))
+  saveRDS(crossed_labs,glue::glue("{datadir}/crossed_labs.RDS"))
 }
 ```
 
@@ -59,8 +58,8 @@ for(collection in collections){
 for(collection in collections){
   datadir=glue::glue("data/{collection}")
   publications=readRDS(glue::glue("{datadir}/publications.RDS"))
-  text_title=tidy_text(publications,"text")
-  saveRDS(text_title,
+  text=tidy_text(publications,"text")
+  saveRDS(text,
           glue::glue("{datadir}/text.RDS"))
 }
 ```
