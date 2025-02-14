@@ -11,7 +11,40 @@ library(shiny)
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
-
+  r_get_ref_authors=reactive({
+    publis=readRDS(glue::glue("{datadir}/publications.RDS")) %>%
+      dplyr::select(id_ref,abstract=en_abstract_s,title=title_en,keywords=keywords_s) %>%
+      dplyr::mutate_all(tidyr::replace_na,replace="") %>%
+      tidyr::unite("text",2:4,remove=FALSE)
+    data_ref_authors=readRDS(glue::glue("{datadir}/data_ref_authors.RDS")) %>%
+      dplyr::mutate(title_en=dplyr::case_when(title_en==""~title_s,
+                                              TRUE~title_en)) %>%
+      dplyr::select(id_ref,
+                    title=title_en,
+                    journal=journalTitle_s,
+                    author=name,
+                    affiliation,
+                    docType=docType_s,
+                    year=producedDateY_i,
+                    keywords=keywords_s) %>%
+      dplyr::filter(year>=input$years[1],
+                    year<=input$years[2]) %>%
+      dplyr::left_join(publis)
+    if(input$doctype=="ART"){data_ref_authors=data_ref_authors %>% dplyr::filter(docType=="ART")}
+    if(input$textsearch!=""){
+      varsearch=rlang::sym(input$varsearch)
+      data_ref_authors = data_ref_authors %>%
+        dplyr::filter(stringr::str_detect(!!varsearch,input$textsearch))
+    }
+    data_ref_authors %>%
+      tidyr::unite("authors",all_of(c("author","affiliation")),sep=" (") %>%
+      dplyr::mutate(authors=paste0(authors,")")) %>%
+      dplyr::group_by(dplyr::across(-authors)) %>%
+      tidyr::nest() %>%
+      dplyr::mutate(authors=purrr::map_chr(data, ~paste0(.$authors,collapse="; "))) %>%
+      dplyr::select(-data) %>%
+      dplyr::ungroup()
+  })
   r_get_data_groups=reactive({
     input$collection
     datadir=glue::glue("data/{input$collection}")
@@ -52,11 +85,13 @@ function(input, output, session) {
   })
   output$table_nodes <- DT::renderDT({
     graph=r_get_graph()
-    graph$nodes
+    graph$nodes %>%
+      dplyr::select(name,name_simplified, affiliation, lemma, nrefs,betweenness, x,y)
   })
   output$table_edges <- DT::renderDT({
     graph=r_get_graph()
-    graph$edges
+    graph$edges %>%
+      dplyr::select(namefrom,nameto, nlinks, affiliation, lemma, nrefs)
   })
   r_get_text=reactive({
     collection=input$collection
@@ -68,11 +103,77 @@ function(input, output, session) {
       na.omit()
     data
   })
-  output$word_graph=renderPlot({
+  output$wordfreq=renderPlot({
     data=r_get_text()
-    data_freq=mixr::tidy_frequencies(data,lemma,top_freq=25)
-    mixr::plot_frequencies(data_freq, cat=lemma, frequency=freq)
+    data_freq=HALtere::tidy_frequencies(data,lemma,top_freq=25)
+    HALtere::plot_frequencies(data_freq, cat=lemma, frequency=freq)
+  })
+  output$word_period=renderPlot({
+    data=r_get_text()
+    years=range(data$producedDateY_i)
+    years=sort(c(years,input$cutyear))
+    labels=paste0(years[1:(length(years)-1)],"-",years[2:(length(years))])
+    data2=data %>%
+      dplyr::ungroup()%>%
+      dplyr::mutate(catYear=cut(producedDateY_i,
+                                breaks=years,labels=FALSE)) %>%
+      dplyr::mutate(catYear=labels[catYear])
 
+    if(input$freq_or_spec=="specificity"){
+      data_freq=HALtere::tidy_specificities(data2,lemma,catYear,top_spec=input$number_of_words)
+      plot=HALtere::plot_specificities(data_freq, lemma, catYear)
+    }
+
+    if(input$freq_or_spec=="frequency"){
+      data_freq=data2 %>%
+        dplyr::group_by(lemma,catYear) %>%
+        dplyr::tally() %>%
+        dplyr::group_by(catYear)  %>%
+        dplyr::arrange(desc(n)) %>%
+        dplyr::mutate(id=1:dplyr::n()) %>%
+        dplyr::filter(id<input$number_of_words) %>%
+        dplyr::ungroup() %>%
+        na.omit()
+      plot=ggplot2::ggplot(data_freq,ggplot2::aes(x=-id,y=n,fill=catYear))+
+        ggplot2::geom_bar(stat="identity",alpha=0.5)+
+        ggplot2::facet_wrap(ggplot2::vars(catYear),scales="free")+
+        ggplot2::scale_x_discrete(breaks=NULL)+
+        ggplot2::coord_flip()+
+        ggplot2::geom_text(ggplot2::aes(label =lemma,
+                                        y = 0), hjust = 0)+
+        ggplot2::labs(x="catYear",y="frequency")+
+          ggplot2::theme(legend.position="none",)
+    }
+    plot
+  })
+
+  output$ref_authors=DT::renderDataTable({
+    result=r_get_ref_authors() %>%
+      dplyr::select(-text) %>%
+      unique()
+    result=result%>%
+      dplyr::select(title,authors,journal, docType, year, keywords,abstract)
+    if(!input$show_abstract){
+      result=result %>% dplyr::select(-abstract)
+    }
+    result=result %>%
+      DT::datatable() %>%
+      DT::formatStyle(columns ="title",width='600px') %>%
+      DT::formatStyle(columns ="authors",width='600px') %>%
+      DT::formatStyle(columns ="keywords",width='600px')
+    if(input$show_abstract){
+        result=result %>%
+          DT::formatStyle(columns ="abstract",width='1200px')
+    }
+    result
+  })
+  output$plot_ref=renderPlot({
+    result=r_get_ref_authors() %>%
+      dplyr::group_by(year) %>%
+      dplyr::summarise(n=dplyr::n_distinct(id_ref))
+    ggplot2::ggplot(result, ggplot2::aes(x=year, y=n))+
+      ggplot2::geom_col(fill="turquoise")+
+      ggplot2::scale_x_continuous(limits=input$years)
   })
 
   ######################"
@@ -84,7 +185,13 @@ function(input, output, session) {
     updateSliderInput(session,"years",
                       min=range_years[1],
                       max=range_years[2],
-                      value=range_years)
+                      value=c(range_years[2]-10, range_years[2]))
+  })
+  observeEvent(input$years,{
+    updateSliderInput(session,"cutyear",
+                      min=input$years[1],
+                      max=input$years[2],
+                      value=round(input$years[1]+(input$years[2]-input$years[1])/2))
   })
   observeEvent(input$groups,{
     max_number_of_names=r_get_data_groups() %>% dplyr::pull(name) %>% unique() %>% length()

@@ -15,12 +15,23 @@ fluidPage(
   fluidRow(column(width=2,
                   tags$img(src = "hex-HALtere.png",
                            height = "50px", width = "50px")),
-           column(width=3,
+           column(width=2,
                   selectInput("collection",
                               "Collection:",
                               c("BIOEENVIS","EVS_UMR5600","OSR","LEHNA","ECOMIC"))),
-           column(width=7,
-                  "Exploration des collections HAL par les graphes de collaborations et les fréquences de mots")),
+           column(width=2,
+                  radioButtons("doctype",
+                               "Type of document",
+                               c("articles only","all documents"))),
+           column(width=2,
+                  sliderInput("years",
+                              "years:",
+                              min = 1970,
+                              max = 2025,
+                              value=c(2020,2025))),
+           column(width=4,
+                  "Exploration des collections HAL par les graphes de collaborations et les fréquences de mots")
+           ),
   tabsetPanel(
     tabPanel(
       "Collaborations",
@@ -31,17 +42,13 @@ fluidPage(
                selectInput("groups",
                            "collaboration between:",
                            c("people","labs")),
-               sliderInput("years",
-                           "years:",
-                           min = 1970,
-                           max = 2025,
-                           value=c(2020,2025)),
                selectInput("sizevar",
                            "Size nodes according to:",
                            choices=c("nrefs")),
                selectInput("namevar",
                            "Display labels corresponding to:",
-                           choices=c("name","affiliation","lemma")),
+                           choices=c("name","name_simplified","lemma"),
+                           selected="name_simplified"),
                selectInput("colorvar",
                            "Color nodes according to:",
                            choices=c("affiliation","name")),
@@ -54,10 +61,7 @@ fluidPage(
                            "Number of names to display:",
                            min=0,
                            max=50,
-                           value=50),
-               radioButtons("doctype",
-                            "Type of document",
-                            c("articles only","all documents"))
+                           value=50)
         ),
 
         # Show a plot of the generated distribution
@@ -75,8 +79,33 @@ fluidPage(
         )
       )
     ),# tabPanel collaborations
-    tabPanel("Mots",
-             plotOutput("word_graph")
-    )
+    tabPanel("Words",
+             plotOutput("wordfreq")),
+    tabPanel("Words by period",
+             fluidRow(
+               column(width=4,
+                      sliderInput("cutyear","cut",min=2000,max=2025,value=2012,step=1)),
+               column(width=3,
+                      radioButtons("freq_or_spec","Scores based on",c("frequency","specificity"),selected="specificity")),
+               column(width=3,
+                      sliderInput("number_of_words","Number of words to display",min=5,max=100,value=20))
+             ),
+             plotOutput("word_period",height="800px")),
+    tabPanel("References table",
+             fluidRow(
+                        column(width=2,
+                               radioButtons("varsearch",
+                                            "Search in:",
+                                            c("title","keywords","abstract","text")),
+                               HTML("Column <b>text</b> gathers title, keywords and abstract.")),
+                        column(width=3,
+                               textInput("textsearch",
+                                         "Search for:",
+                                         ""),
+                               checkboxInput("show_abstract","Show abstract in table",value=FALSE)),
+                        column(width=7,
+                               plotOutput("plot_ref", height="300px"))
+             ),
+             DT::dataTableOutput("ref_authors"))
   )#tabsetPanel
 )
