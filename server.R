@@ -12,21 +12,22 @@ library(shiny)
 # Define server logic required to draw a histogram
 function(input, output, session) {
   r_get_ref_authors=reactive({
+    datadir=glue::glue("data/{input$collection}")
     publis=readRDS(glue::glue("{datadir}/publications.RDS")) %>%
-      dplyr::select(id_ref,abstract=en_abstract_s,title=title_en,keywords=keywords_s) %>%
+      dplyr::select(id_ref,abstract=abstract_s,title=title_s,keywords=keyword_s) %>%
       dplyr::mutate_all(tidyr::replace_na,replace="") %>%
       tidyr::unite("text",2:4,remove=FALSE)
     data_ref_authors=readRDS(glue::glue("{datadir}/data_ref_authors.RDS")) %>%
-      dplyr::mutate(title_en=dplyr::case_when(title_en==""~title_s,
-                                              TRUE~title_en)) %>%
+      # dplyr::mutate(title_s=dplyr::case_when(title_s==""~title_s,
+      #                                         TRUE~title_s)) %>%
       dplyr::select(id_ref,
-                    title=title_en,
+                    title=title_s,
                     journal=journalTitle_s,
                     author=name,
                     affiliation,
                     docType=docType_s,
                     year=producedDateY_i,
-                    keywords=keywords_s) %>%
+                    keywords=keyword_s) %>%
       dplyr::filter(year>=input$years[1],
                     year<=input$years[2]) %>%
       dplyr::left_join(publis)

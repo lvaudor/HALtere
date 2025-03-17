@@ -6,7 +6,8 @@ editor: visual
 
 ```{r setup}
 library(HALtere)
-collections=c("BIOEENVIS","EVS_UMR5600","OSR","LEHNA","ECOMIC")#LBBE
+collections=c("BIOEENVIS","EVS_UMR5600",
+              "OSR","LEHNA","ECOMIC")#LBBE
 #collections="LBBE"
 ```
 
