@@ -13,38 +13,40 @@ library(shiny)
 function(input, output, session) {
   r_get_ref_authors=reactive({
     datadir=glue::glue("data/{input$collection}")
-    publis=readRDS(glue::glue("{datadir}/publications.RDS")) %>%
-      dplyr::select(id_ref,abstract=abstract_s,title=title_s,keywords=keyword_s) %>%
-      dplyr::mutate_all(tidyr::replace_na,replace="") %>%
-      tidyr::unite("text",2:4,remove=FALSE)
-    data_ref_authors=readRDS(glue::glue("{datadir}/data_ref_authors.RDS")) %>%
-      # dplyr::mutate(title_s=dplyr::case_when(title_s==""~title_s,
-      #                                         TRUE~title_s)) %>%
-      dplyr::select(id_ref,
-                    title=title_s,
-                    journal=journalTitle_s,
-                    author=name,
-                    affiliation,
-                    docType=docType_s,
-                    year=producedDateY_i,
-                    keywords=keyword_s) %>%
-      dplyr::filter(year>=input$years[1],
-                    year<=input$years[2]) %>%
-      dplyr::left_join(publis)
-    if(input$doctype=="ART"){data_ref_authors=data_ref_authors %>% dplyr::filter(docType=="ART")}
-    if(input$textsearch!=""){
-      varsearch=rlang::sym(input$varsearch)
-      data_ref_authors = data_ref_authors %>%
-        dplyr::filter(stringr::str_detect(!!varsearch,input$textsearch))
-    }
-    data_ref_authors %>%
-      tidyr::unite("authors",all_of(c("author","affiliation")),sep=" (") %>%
+    #one line for all authors of one publication
+    data_ref_authors=readRDS(glue::glue("{datadir}/data_ref_authors.RDS"))%>%
+      tidyr::unite("authors",all_of(c("name","affiliation")),sep=" (") %>%
       dplyr::mutate(authors=paste0(authors,")")) %>%
-      dplyr::group_by(dplyr::across(-authors)) %>%
+      dplyr::select(id_ref,authors) %>%
+      dplyr::group_by(id_ref) %>%
       tidyr::nest() %>%
       dplyr::mutate(authors=purrr::map_chr(data, ~paste0(.$authors,collapse="; "))) %>%
       dplyr::select(-data) %>%
-      dplyr::ungroup()
+      dplyr::ungroup() %>%
+      dplyr::select(id_ref,authors)
+    publis=readRDS(glue::glue("{datadir}/publications.RDS")) %>%
+      dplyr::mutate(title=dplyr::case_when(translate_title_s==TRUE~paste0(title_s," (translated)"),TRUE~title_s),
+                    keywords=dplyr::case_when(translate_keyword_s==TRUE~paste0(keyword_s," (translated)"),TRUE~keyword_s),
+                    abstract=dplyr::case_when(translate_keyword_s==TRUE~paste0(abstract_s," (translated)"),TRUE~abstract_s)) %>%
+      dplyr::select(id_ref,
+                    title,
+                    journal=journalTitle_s,
+                    docType=docType_s,
+                    year=producedDateY_i,
+                    keywords,
+                    abstract,
+                    text) %>%
+       dplyr::filter(year>=input$years[1],
+                     year<=input$years[2]) %>%
+      dplyr::left_join(data_ref_authors) %>%
+      unique()
+    if(input$doctype=="ART"){publis=publis %>% dplyr::filter(docType=="ART")}
+    if(input$textsearch!=""){
+      varsearch=rlang::sym(input$varsearch)
+      publis=publis %>%
+        dplyr::filter(stringr::str_detect(!!varsearch,input$textsearch))
+    }
+    publis
   })
   r_get_data_groups=reactive({
     input$collection
