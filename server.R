@@ -40,7 +40,7 @@ function(input, output, session) {
                      year<=input$years[2]) %>%
       dplyr::left_join(data_ref_authors) %>%
       unique()
-    if(input$doctype=="ART"){publis=publis %>% dplyr::filter(docType=="ART")}
+    if(input$doctype=="articles only"){publis=publis %>% dplyr::filter(docType=="ART")}
     if(input$textsearch!=""){
       varsearch=rlang::sym(input$varsearch)
       publis=publis %>%
@@ -64,7 +64,7 @@ function(input, output, session) {
 
     data_crossed=readRDS(glue::glue("{datadir}/crossed_{groups}.RDS")) %>%
       dplyr::filter(producedDateY_i>=input$years[1] & producedDateY_i<=input$years[2])
-    if(input$doctype=="ART"){
+    if(input$doctype=="articles only"){
       data_crossed=data_crossed %>%
         dplyr::filter(docType_s=="ART")
     }
@@ -104,6 +104,9 @@ function(input, output, session) {
       dplyr::filter(producedDateY_i>=input$years[1],
                     producedDateY_i<=input$years[2]) %>%
       na.omit()
+    if(input$doctype=="articles only"){
+      data=data %>% dplyr::filter(docType_s=="ART")
+      }
     data
   })
   output$wordfreq=renderPlot({

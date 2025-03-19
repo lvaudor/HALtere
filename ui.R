@@ -100,8 +100,9 @@ fluidPage(
                                HTML("Column <b>text</b> gathers title, keywords and abstract.")),
                         column(width=3,
                                textInput("textsearch",
-                                         "Search for:",
+                                         "Search for text or regular expression:",
                                          ""),
+                               p("Example: '\\b[Mm]ine|\\b[Mm]ining' to search for words mine or mining (with or without capital letter)."),
                                checkboxInput("show_abstract","Show abstract in table",value=FALSE)),
                         column(width=7,
                                plotOutput("plot_ref", height="300px"))
