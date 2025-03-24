@@ -61,9 +61,15 @@ function(input, output, session) {
     input$doctype
     groups=input$groups
     datadir=glue::glue("data/{input$collection}")
-
     data_crossed=readRDS(glue::glue("{datadir}/crossed_{groups}.RDS")) %>%
       dplyr::filter(producedDateY_i>=input$years[1] & producedDateY_i<=input$years[2])
+    if(input$choose_group){
+      elems_in_the_graph=data_crossed %>%
+        dplyr::filter(val1==input$chosen_group) %>%
+        dplyr::pull(val2)
+      data_crossed=data_crossed %>%
+        dplyr::filter(val1 %in% c(input$chosen_group,elems_in_the_graph))
+    }
     if(input$doctype=="articles only"){
       data_crossed=data_crossed %>%
         dplyr::filter(docType_s=="ART")
@@ -183,7 +189,15 @@ function(input, output, session) {
   })
 
   ######################"
-
+  observe({
+    groups_names=r_get_data_groups() %>%
+      dplyr::pull(name) %>%
+      unique()
+    updateSelectInput(session,
+                      "chosen_group",
+                      choices=groups_names,
+                      selected=groups_names[1])
+  })
   observeEvent(input$collection,{
     datadir=input$collection
     publications=readRDS(glue::glue("data/{datadir}/publications.RDS"))

@@ -15,10 +15,10 @@ fluidPage(
   fluidRow(column(width=2,
                   tags$img(src = "hex-HALtere.png",
                            height = "50px", width = "50px")),
-           column(width=2,
+           column(width=3,
                   selectInput("collection",
                               "Collection:",
-                              c("BIOEENVIS","EVS_UMR5600","OSR","LEHNA","ECOMIC"))),
+                              c("BIOEENVIS","EVS_UMR5600","LABEX-DRIIHM","OHM-VALLEE_DU_RHONE","OSR","LEHNA","ECOMIC"))),
            column(width=2,
                   radioButtons("doctype",
                                "Type of document",
@@ -29,7 +29,7 @@ fluidPage(
                               min = 1970,
                               max = 2025,
                               value=c(2020,2025))),
-           column(width=4,
+           column(width=3,
                   "Exploration des collections HAL par les graphes de collaborations et les fréquences de mots")
            ),
   tabsetPanel(
@@ -61,7 +61,17 @@ fluidPage(
                            "Number of names to display:",
                            min=0,
                            max=50,
-                           value=50)
+                           value=50),
+               checkboxInput("choose_group",
+                             "Focus on sub-graph containing this group",
+                             value=FALSE),
+               conditionalPanel(
+                 condition="input.choose_group==true",
+                 selectInput("chosen_group",
+                             "Select a group",
+                             choices=c("a","b"),
+                             selected="a")
+               )
         ),
 
         # Show a plot of the generated distribution

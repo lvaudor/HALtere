@@ -7,7 +7,8 @@ editor: visual
 ```{r setup}
 library(HALtere)
 collections=c("BIOEENVIS","EVS_UMR5600",
-              "OSR","LEHNA","ECOMIC")#LBBE
+              "OSR","LEHNA","ECOMIC",
+              "OHM-VALLEE_DU_RHONE","LABEX-DRIIHM")
 #collections="LBBE"
 ```
 
@@ -18,7 +19,6 @@ for(collection in collections){
   datadir=glue::glue("data/{collection}")
   dir.create(datadir,showWarnings = FALSE)
   publications=extract_collection(collection)
-  saveRDS(publications,glue::glue("{datadir}/publications.RDS"))
 }
 ```
 
