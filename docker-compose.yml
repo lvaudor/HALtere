@@ -1,0 +1,6 @@
+services:
+  app:
+    image: gcr.io/lvaudor/haltere:latest
+    build: .
+    ports:
+      - "3840:3840"
