@@ -28,6 +28,7 @@ ADD . /app
 WORKDIR /app
 
 EXPOSE 3840
+HEALTHCHECK --interval=1m --timeout=3s CMD wget --no-verbose --tries=1 --spider http://localhost:3840/ || exit 1
 
 RUN groupadd -g 1010 app && useradd -c 'app' -u 1010 -g 1010 -m -d /home/app -s /sbin/nologin app
 USER app

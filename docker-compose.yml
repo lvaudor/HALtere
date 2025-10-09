@@ -4,5 +4,3 @@ services:
     build: .
     ports:
       - "3840:3840"
-    volumes:
-      - "./data:/app/data:ro"
