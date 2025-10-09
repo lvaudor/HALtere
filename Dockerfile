@@ -18,9 +18,9 @@ RUN Rscript -e 'install.packages("tidyr")'
 RUN Rscript -e 'install.packages("dplyr")'
 RUN Rscript -e 'install.packages("DT")'
 RUN Rscript -e 'install.packages("ggplot2")'
-RUN Rscript -e 'install.packages("mixR")'
 RUN Rscript -e 'install.packages("remotes")'
 
+RUN R -e 'remotes::install_github("lvaudor/mixr")'
 RUN R -e 'remotes::install_github("lvaudor/HALtere_pack")'
 
 RUN mkdir /app
