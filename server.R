@@ -54,7 +54,42 @@ function(input, output, session) {
     groups=input$groups
     data_groups=readRDS(glue::glue("{datadir}/data_{groups}.RDS")) %>%
       dplyr::filter(producedDateY_i>=input$years[1] & producedDateY_i<=input$years[2])
-  })
+    data_words=readRDS(glue::glue("{datadir}/data_words.RDS"))
+    data_words=data_words%>%
+      dplyr::filter(!is.na(lemma_completed)) %>%
+      dplyr::filter(producedDateY_i>=input$years[1] & producedDateY_i<=input$years[2])
+    if(groups=="labs"){
+      data_words=data_words %>%
+        dplyr::mutate(name=affiliation,
+                      name_simplified=affiliation_simplified)
+    }
+    spec=data_words %>%
+      group_by(name,name_simplified,lemma_completed) %>%
+      summarise(q=n(),.groups="drop") %>%  #number of white balls drawn
+      group_by(name,name_simplified) %>%
+      mutate(k=n()) %>% # number of balls drawn
+      ungroup() %>%
+      group_by(lemma_completed) %>%
+      mutate(m=n()) %>%  #number of white balls
+      ungroup() %>%
+      mutate(n=n()-m) %>% #number of black balls
+      mutate(p=purrr::pmap_dbl(list(q=q, k=k,m=m,n=n),phyper)) %>%
+      mutate(p=(1-p)*log(2)) %>%
+      mutate(spec=-log2(p)) %>%
+      dplyr::arrange(name,desc(spec),desc(q),m) %>%
+      dplyr::group_by(name) %>%
+      tidyr::nest() %>%
+      dplyr::mutate(data=purrr::map(data,~.x[1,])) %>%
+      tidyr::unnest(cols=c("data")) %>%
+      ungroup()
+    dat_groups=data_groups %>%
+      dplyr::left_join(spec %>%
+                         dplyr::select(name,lemma=lemma_completed,spec),
+                       by="name") %>%
+      dplyr::mutate(lemma=dplyr::case_when(is.na(lemma)~name,
+                                           TRUE~lemma))
+
+    })
   r_get_data_crossed=reactive({
     input$collection
     input$years

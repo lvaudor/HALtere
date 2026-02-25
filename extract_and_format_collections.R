@@ -6,8 +6,9 @@ collections=c("BIOEENVIS",
               "LEHNA",
               "ECOMIC",
               "OHM-VALLEE_DU_RHONE",
-              "LABEX-DRIIHM",
-              "LBBE")
+              "LABEX-DRIIHM"
+              #"LBBE"
+              )
 
 
 ## ----record_publications_in_data---------------------------------------------------------------------------------------
@@ -19,7 +20,6 @@ for(collection in collections){
   publications=extract_collection(collection)
   rm(publications)
 }
-
 
 ## ----record_data_ref_authors_people_and_labs---------------------------------------------------------------------------
 print("DATA_REF_AUTHORS, DATA_PEOPLE, DATA_LABS")
@@ -35,8 +35,10 @@ for(collection in collections){
   saveRDS(data_ref_authors,glue::glue("{datadir}/data_ref_authors.RDS"))
 
   # 2) calculate data_words
-  data_words=tidy_words(data_ref_autors)
-  saveRDS(data_ref_authors,glue::glue("{datadir}/data_words.RDS"))
+
+  data_ref_authors=readRDS(glue::glue("{datadir}/data_ref_authors.RDS"))
+  data_words=tidy_words(data_ref_authors)
+  saveRDS(data_words,glue::glue("{datadir}/data_words.RDS"))
 
   # 3) based on data_ref_authors, group by person
   data_people=tidy_groups(data_ref_authors, type="people")
@@ -47,7 +49,7 @@ for(collection in collections){
   saveRDS(data_labs,glue::glue("{datadir}/data_labs.RDS"))
 
   # 5) make space in environment
-  rm(data_ref_authors,data_people,data_labs)
+  rm(data_ref_authors,data_words,data_people,data_labs)
 }
 
 
