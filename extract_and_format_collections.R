@@ -9,6 +9,7 @@ collections=c("BIOEENVIS",
               "LABEX-DRIIHM",
               "PEPR_ONEWATER"
               )
+
 ## ----record_publications_in_data---------------------------------------------------------------------------------------
 print("LIST OF PUBLICATIONS")
 for(collection in collections){
