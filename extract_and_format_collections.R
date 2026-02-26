@@ -6,11 +6,9 @@ collections=c("BIOEENVIS",
               "LEHNA",
               "ECOMIC",
               "OHM-VALLEE_DU_RHONE",
-              "LABEX-DRIIHM"
-              #"LBBE"
+              "LABEX-DRIIHM",
+              "PEPR_ONEWATER"
               )
-
-
 ## ----record_publications_in_data---------------------------------------------------------------------------------------
 print("LIST OF PUBLICATIONS")
 for(collection in collections){

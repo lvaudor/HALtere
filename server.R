@@ -64,24 +64,24 @@ function(input, output, session) {
                       name_simplified=affiliation_simplified)
     }
     spec=data_words %>%
-      group_by(name,name_simplified,lemma_completed) %>%
-      summarise(q=n(),.groups="drop") %>%  #number of white balls drawn
-      group_by(name,name_simplified) %>%
-      mutate(k=n()) %>% # number of balls drawn
-      ungroup() %>%
-      group_by(lemma_completed) %>%
-      mutate(m=n()) %>%  #number of white balls
-      ungroup() %>%
-      mutate(n=n()-m) %>% #number of black balls
-      mutate(p=purrr::pmap_dbl(list(q=q, k=k,m=m,n=n),phyper)) %>%
-      mutate(p=(1-p)*log(2)) %>%
-      mutate(spec=-log2(p)) %>%
+      dplyr::group_by(name,name_simplified,lemma_completed) %>%
+      dplyr::summarise(q=dplyr::n(),.groups="drop") %>%  #number of white balls drawn
+      dplyr::group_by(name,name_simplified) %>%
+      dplyr::mutate(k=dplyr::n()) %>% # number of balls drawn
+      dplyr::ungroup() %>%
+      dplyr::group_by(lemma_completed) %>%
+      dplyr::mutate(m=dplyr::n()) %>%  #number of white balls
+      dplyr::ungroup() %>%
+      dplyr::mutate(n=dplyr::n()-m) %>% #number of black balls
+      dplyr::mutate(p=purrr::pmap_dbl(list(q=q, k=k,m=m,n=n),phyper)) %>%
+      dplyr::mutate(p=(1-p)*log(2)) %>%
+      dplyr::mutate(spec=-log2(p)) %>%
       dplyr::arrange(name,desc(spec),desc(q),m) %>%
       dplyr::group_by(name) %>%
       tidyr::nest() %>%
       dplyr::mutate(data=purrr::map(data,~.x[1,])) %>%
       tidyr::unnest(cols=c("data")) %>%
-      ungroup()
+      dplyr::ungroup()
     dat_groups=data_groups %>%
       dplyr::left_join(spec %>%
                          dplyr::select(name,lemma=lemma_completed,spec),

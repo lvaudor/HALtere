@@ -18,7 +18,7 @@ fluidPage(
            column(width=3,
                   selectInput("collection",
                               "Collection:",
-                              c("BIOEENVIS","EVS_UMR5600","LABEX-DRIIHM","OHM-VALLEE_DU_RHONE","OSR","LEHNA","ECOMIC"))),
+                              list.files("data"))),
            column(width=2,
                   radioButtons("doctype",
                                "Type of document",
