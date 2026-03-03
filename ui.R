@@ -74,6 +74,7 @@ fluidPage(
                )
         ),
 
+
         # Show a plot of the generated distribution
         column(width=10,
                tabsetPanel(
