@@ -152,8 +152,8 @@ function(input, output, session) {
   })
   output$wordfreq=renderPlot({
     data=r_get_text()
-    data_freq=HALtere::tidy_frequencies(data,lemma,top_freq=25)
-    HALtere::plot_frequencies(data_freq, cat=lemma, frequency=freq)
+    data_freq=HALtere::tidy_frequencies(data,lemma_completed,top_freq=25)
+    HALtere::plot_frequencies(data_freq, cat=lemma_completed, frequency=freq)
   })
   output$word_period=renderPlot({
     data=r_get_text()
