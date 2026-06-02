@@ -1,32 +1,73 @@
 ## ----setup-------------------------------------------------------------------------------------------------------------
-library(HALtere)
-df_identifiers=dplyr::bind_rows(
-  tibble::tibble(identifier="BIOEENVIS",
-                 hal_variable="collCode_s"),
-  tibble::tibble(identifier="EVS_UMR5600",
-                 hal_variable="collCode_s"),
-  tibble::tibble(identifier="OSR",
-                 hal_variable="collCode_s"),
-  tibble::tibble(identifier="LEHNA",
-                 hal_variable="collCode_s"),
-  tibble::tibble(identifier="ECOMIC",
-                 hal_variable="collCode_s"),
-  tibble::tibble(identifier="OHM-VALLEE_DU_RHONE",
-                 hal_variable="collCode_s"),
-  tibble::tibble(identifier="LABEX-DRIIHM",
-                 hal_variable="collCode_s"),
-  tibble::tibble(identifier="PEPR_ONEWATER",
-                 hal_variable="collCode_s"),
-  tibble::tibble(identifier="lise-vaudor",
-                 hal_variable="authIdHal_s"),
-  tibble::tibble(identifier="183708",
-                 hal_variable="authIdPerson_i"),
-  tibble::tibble(identifier="ANR-22-CE03-0005",
-                  hal_variable="anrProjectReference_s")
-)
-for(i in 1:nrow(df_identifiers)){
-  identifier=df_identifiers$identifier[i]
-  hal_variable=df_identifiers$hal_variable[i]
-  prepare_all_data(identifier, hal_variable)
-}
 
+library(HALtere)
+
+cat(
+  "This directory is a HALtere data directory",
+  file = "data_HALtere/HALtere_data_directory_README.txt"
+)
+
+HALtere_directories <- dplyr::bind_rows(
+
+  # prepare_HALtere_directory(
+  #   query = 'collCode_s:"BIOEENVIS"'
+  # ),
+
+  # prepare_HALtere_directory(
+  #   query = 'collCode_s:"EVS_UMR5600"'
+  # ),
+
+  # prepare_HALtere_directory(
+  #   query = 'collCode_s:"OSR"'
+  # ),
+
+  # prepare_HALtere_directory(
+  #   query = 'collCode_s:"LEHNA"'
+  # ),
+
+  # prepare_HALtere_directory(
+  #   query = 'collCode_s:"ECOMIC"'
+  # ),
+
+  # prepare_HALtere_directory(
+  #   query = 'collCode_s:"OHM-VALLEE_DU_RHONE"'
+  # ),
+
+  # prepare_HALtere_directory(
+  #   query = 'collCode_s:"LABEX-DRIIHM"'
+  # ),
+
+  # prepare_HALtere_directory(
+  #   query = 'collCode_s:"PEPR_ONEWATER"'
+  # ),
+
+  prepare_HALtere_directory(
+    custom_name = "Lise Vaudor",
+    query = 'authIdHal_s:"lise-vaudor"'
+  ),
+
+  prepare_HALtere_directory(
+    custom_name = "Barbara Belletti",
+    query = 'authIdPerson_i:"183708"'
+  ),
+
+  prepare_HALtere_directory(
+    custom_name = "GloUrb",
+    query = 'anrProjectReference_s:"ANR-22-CE03-0005"'
+  )
+
+)
+
+for (i in seq_len(nrow(HALtere_directories))) {
+
+  custom_name <- HALtere_directories$custom_name[i]
+
+  query <- HALtere_directories$query[i]
+
+  prepare_all_data(
+    custom_name = custom_name,
+    query = query,
+    data_dir = "data_HALtere"
+  )
+
+}

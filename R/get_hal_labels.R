@@ -8,7 +8,6 @@
 
 get_hal_labels <- function(identifier,
                            identifier_type) {
-browser()
 # Endpoint et champs selon le type d'identifiant
 config <- switch(
 

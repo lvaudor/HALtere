@@ -1,12 +1,12 @@
 #' Produces data_text, which is derived from a publications tibble
-#' @param collection a collection name
+#' @param custom_name a custom_name name
 #' @param data_dir the path to data directory
 #' @return a tibble
 #' @export
 #' @examples
 #' data_text=tidy_text("BIOEENVIS", data=data_dir,column="text")
-tidy_text=function(collection,data_dir="data",column){
-  data=readRDS(glue::glue("{data_dir}/{collection}/publications.RDS"))
+tidy_text=function(custom_name,data_dir="data",column){
+  data=readRDS(glue::glue("{data_dir}/{custom_name}/publications.RDS"))
   string_column=column
   column=rlang::sym(column)
   res=data %>%
@@ -26,7 +26,7 @@ tidy_text=function(collection,data_dir="data",column){
     dplyr::ungroup()
 
   saveRDS(res,
-          glue::glue("{data_dir}/{collection}/text.RDS"))
+          glue::glue("{data_dir}/{custom_name}/text.RDS"))
 
   return(res)
 }

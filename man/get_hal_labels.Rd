@@ -2,26 +2,18 @@
 % Please edit documentation in R/get_hal_labels.R
 \name{get_hal_labels}
 \alias{get_hal_labels}
-\title{Retrieve human-readable labels from HAL identifiers}
+\title{Retrieve a human-readable HAL label from an identifier}
 \usage{
-get_hal_labels(
-  identifier,
-  hal_variable = c("anrProjectReference_s", "collCode_s", "authIdHal_s",
-    "structAcronym_s")
-)
+get_hal_labels(identifier, identifier_type)
 }
 \arguments{
-\item{identifier}{identifier to query}
+\item{identifier}{identifier value}
 
-\item{type}{one of:
-- "project"
-- "author"
-- "lab"
-- "collection"}
+\item{identifier_type}{HAL field used as identifier}
 }
 \value{
-a tibble with identifiers and labels
+character vector
 }
 \description{
-Retrieve human-readable labels from HAL identifiers
+Retrieve a human-readable HAL label from an identifier
 }

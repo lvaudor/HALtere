@@ -7,7 +7,7 @@
 show_ref_authors(publications, data_ref_authors)
 }
 \arguments{
-\item{publications}{a tibble produced with the extract_collection() function}
+\item{publications}{a tibble produced with the extract_publications() function}
 
 \item{data_ref_authors}{a tibble produced with the tidy_ref_authors() function}
 }
@@ -18,7 +18,7 @@ a tibble with simplified ref_authors information
 Produces a simplified table of ref_authors
 }
 \examples{
-data=extract_collection("BIOEENVIS", nmax=200)
+data=extract_publications("BIOEENVIS", nmax=200)
 data_ref_authors=tidy_ref_authors(data)
 show_ref_authors(publications=data, data_ref_authors=data_ref_authors)
 }

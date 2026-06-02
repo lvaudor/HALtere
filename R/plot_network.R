@@ -5,7 +5,7 @@
 #' @return a graph
 #' @export
 #' @examples
-#' data=extract_collection("BIOEENVIS", nmax=200)
+#' data=extract_publications("BIOEENVIS", nmax=200)
 #' data_ref_authors=tidy_ref_authors(data)
 #'
 #' data_groups=tidy_groups(data_ref_authors,type="people")
@@ -58,7 +58,7 @@ build_network=function(data_crossed,
     namefrom=nodes$name[edges$from],
     nameto=nodes$name[edges$to],
     nlinks=edges$nlinks) %>%
-    dplyr::left_join(data_summary,by=c("namefrom"="name")) %>%
+    dplyr::left_join(data_summary,by=c("namefrom"="name"),relationship = "many-to-many") %>%
     dplyr::mutate(hover=glue::glue("{namefrom}-\n{nameto}:\n{nlinks} links")) %>%
     dplyr::mutate(width=round(dplyr::percent_rank(nlinks)*10+0.5)) %>%
     dplyr::mutate(line_color= "rgb(200,200,200)")
@@ -83,7 +83,7 @@ build_network=function(data_crossed,
 #' @return a tibble
 #' @export
 #' @examples
-#' dat=extract_collection("BIOEENVIS", nmax=200)
+#' dat=extract_publications("BIOEENVIS", nmax=200)
 #' data_ref_authors=tidy_ref_authors(dat)
 #'
 #' data_groups=tidy_groups(data_ref_authors,type="people")

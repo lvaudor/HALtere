@@ -4,15 +4,17 @@
 \alias{prepare_all_data}
 \title{Get all HALtere data}
 \usage{
-prepare_all_data(collection, hal_variable = "collection")
+prepare_all_data(custom_name, hal_variable, identifier)
 }
 \arguments{
-\item{collection}{a collection name}
+\item{custom_name}{name to give to the list of publications. If NA (default) the directory will be named after the used HAL identifier.}
 
 \item{hal_variable}{the HAL variable used to retrieve items. Can be collCode_s (for collections), authIdHal_s (for person)}
+
+\item{identifier}{the identifier (going with hal_variable) used to retrieve HAL items.}
 }
 \value{
-the characteristics of all datasets generated for the collection. Can be "collection", "person", "lab".
+the characteristics of datasets retrieved for this list of publications
 }
 \description{
 Get all HALtere data

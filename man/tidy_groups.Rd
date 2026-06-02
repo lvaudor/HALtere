@@ -5,14 +5,14 @@
 \title{Get groups stats from publications and groups-relative stats}
 \usage{
 tidy_groups(
-  collection,
+  custom_name,
   data_dir = "data",
   method = "shortest",
   type = "people"
 )
 }
 \arguments{
-\item{collection}{a collection name}
+\item{custom_name}{a publications list custom name}
 
 \item{data_dir}{the path to data directory}
 

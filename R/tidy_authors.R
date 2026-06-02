@@ -1,14 +1,14 @@
 #' Description
-#' @param collection a collection name
+#' @param custom_name a publications list custom name
 #' @param data_dir the path to data directory
 #' @param method method to shorten names. Defaults to "shortest".
 #' @return a tibble
 #' @export
 #' @examples
-#' data=extract_collection("BIOEENVIS", nmax=200)
+#' data=extract_publications("BIOEENVIS", nmax=200)
 #' data_ref_authors=tidy_ref_authors(data)
-tidy_ref_authors=function(collection, data_dir="data", method="shortest"){
-  datapath=glue::glue("{data_dir}/{collection}/publications.RDS")
+tidy_ref_authors=function(custom_name, data_dir="data", method="shortest"){
+  datapath=glue::glue("{data_dir}/{custom_name}/publications.RDS")
   data=readRDS(datapath)
   # get the info about names, ids and affiliation of each author of each ref
   dat=data %>%
@@ -47,7 +47,8 @@ tidy_ref_authors=function(collection, data_dir="data", method="shortest"){
   dat=dat %>%
     dplyr::left_join(tib_authors_names_with_internal_id %>%
                        dplyr::select(id_internal,name) %>%
-                       unique(),by=c("id_internal")) %>%
+                       unique(),by=c("id_internal"),
+                     relationship = "many-to-many") %>%
     dplyr::mutate(name=dplyr::case_when(is.na(name)~auth,
                                         TRUE~name)) %>%
     dplyr::select(-starts_with("auth"))
@@ -76,8 +77,8 @@ tidy_ref_authors=function(collection, data_dir="data", method="shortest"){
   dat=dat %>%
     dplyr::select(-affiliation) %>%
     unique() %>%
-    dplyr::left_join(dat_aff,by=c("producedDateY_i","name")) %>%
-    dplyr::left_join(dat_aff_maj,by=c("name")) %>%
+    dplyr::left_join(dat_aff,by=c("producedDateY_i","name"),relationship = "many-to-many") %>%
+    dplyr::left_join(dat_aff_maj,by=c("name"),relationship = "many-to-many") %>%
     dplyr::mutate(affiliation=dplyr::case_when(is.na(affiliation)~affmaj,
                                                TRUE~affiliation)) %>%
     dplyr::select(-affmaj)
@@ -85,18 +86,18 @@ tidy_ref_authors=function(collection, data_dir="data", method="shortest"){
     dplyr::mutate(name_simplified=stringr::str_extract(name,"(?<=\\s).*$"),
                   affiliation_simplified=stringr::str_replace_all(affiliation,"[^A-Z0-9]*",""))
 
-  saveRDS(dat,glue::glue("{data_dir}/{collection}/data_ref_authors.RDS"))
+  saveRDS(dat,glue::glue("{data_dir}/{custom_name}/data_ref_authors.RDS"))
   return(dat)
 }
 
 
 #' Produces a simplified table of ref_authors
-#' @param publications a tibble produced with the extract_collection() function
+#' @param publications a tibble produced with the extract_publications() function
 #' @param data_ref_authors a tibble produced with the tidy_ref_authors() function
 #' @return a tibble with simplified ref_authors information
 #' @export
 #' @examples
-#' data=extract_collection("BIOEENVIS", nmax=200)
+#' data=extract_publications("BIOEENVIS", nmax=200)
 #' data_ref_authors=tidy_ref_authors(data)
 #' show_ref_authors(publications=data, data_ref_authors=data_ref_authors)
 show_ref_authors=function(publications, data_ref_authors){
@@ -135,11 +136,11 @@ show_ref_authors=function(publications, data_ref_authors){
 #' @return a tibble with all title words
 #' @export
 #' @examples
-#' data=extract_collection("EVS_UMR5600", nmax=50)
+#' data=extract_publications("EVS_UMR5600", nmax=50)
 #' data_ref_authors=tidy_ref_authors(data)
 #' data_words=tidy_words(data_)
-tidy_words=function(collection, data_dir="data"){
-  datapath=glue::glue("{data_dir}/{collection}/data_ref_authors.RDS")
+tidy_words=function(custom_name, data_dir="data"){
+  datapath=glue::glue("{data_dir}/{custom_name}/data_ref_authors.RDS")
   data_ref_authors = readRDS(datapath)
   data(lexicon_en)
   res=data_ref_authors %>%
@@ -158,12 +159,12 @@ tidy_words=function(collection, data_dir="data"){
                   type,
                   lemma_completed)
 
-  saveRDS(res,glue::glue("{data_dir}/{collection}/data_words.RDS"))
+  saveRDS(res,glue::glue("{data_dir}/{custom_name}/data_words.RDS"))
   return(res)
 }
 
 #' Get groups stats from publications and groups-relative stats
-#' @param collection a collection name
+#' @param custom_name a publications list custom name
 #' @param data_dir the path to data directory
 #' @param method method to shorten names. Defaults to "shortest"
 #' @param type whether to group by "people" or "labs"
@@ -171,8 +172,8 @@ tidy_words=function(collection, data_dir="data"){
 #' @export
 #' @examples
 #' data_labs=tidy_groups("BIOEENVIS",type="labs")
-tidy_groups=function(collection, data_dir="data",method="shortest", type="people"){
-  datapath=glue::glue("{data_dir}/{collection}/data_ref_authors.RDS")
+tidy_groups=function(custom_name, data_dir="data",method="shortest", type="people"){
+  datapath=glue::glue("{data_dir}/{custom_name}/data_ref_authors.RDS")
   data_ref_authors = readRDS(datapath)
   if(type=="labs"){
     data_ref_authors=data_ref_authors %>%
@@ -206,6 +207,6 @@ tidy_groups=function(collection, data_dir="data",method="shortest", type="people
   #   dplyr::mutate(lemma=dplyr::case_when(is.na(lemma)~name,
   #                                        TRUE~lemma))
 
-  saveRDS(dat_groups,glue::glue("{data_dir}/{collection}/data_{type}.RDS"))
+  saveRDS(dat_groups,glue::glue("{data_dir}/{custom_name}/data_{type}.RDS"))
   return(dat_groups)
 }

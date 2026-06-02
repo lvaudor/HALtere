@@ -35,7 +35,7 @@ a tibble
 Plots network of co-publications by group (defined by data_groups, which can correspond to either people or labs
 }
 \examples{
-dat=extract_collection("BIOEENVIS", nmax=200)
+dat=extract_publications("BIOEENVIS", nmax=200)
 data_ref_authors=tidy_ref_authors(dat)
 
 data_groups=tidy_groups(data_ref_authors,type="people")

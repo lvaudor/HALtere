@@ -4,10 +4,10 @@
 \alias{tidy_text}
 \title{Produces data_text, which is derived from a publications tibble}
 \usage{
-tidy_text(collection, data_dir = "data", column)
+tidy_text(custom_name, data_dir = "data", column)
 }
 \arguments{
-\item{collection}{a collection name}
+\item{custom_name}{a custom_name name}
 
 \item{data_dir}{the path to data directory}
 }

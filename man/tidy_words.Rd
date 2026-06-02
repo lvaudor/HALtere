@@ -4,7 +4,7 @@
 \alias{tidy_words}
 \title{Description}
 \usage{
-tidy_words(collection, data_dir = "data")
+tidy_words(custom_name, data_dir = "data")
 }
 \arguments{
 \item{data_ref_authors}{a tibble produced with the tidy_ref_authors() function}
@@ -16,7 +16,7 @@ a tibble with all title words
 Description
 }
 \examples{
-data=extract_collection("EVS_UMR5600", nmax=50)
+data=extract_publications("EVS_UMR5600", nmax=50)
 data_ref_authors=tidy_ref_authors(data)
 data_words=tidy_words(data_)
 }

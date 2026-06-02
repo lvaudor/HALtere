@@ -4,10 +4,10 @@
 \alias{tidy_ref_authors}
 \title{Description}
 \usage{
-tidy_ref_authors(collection, data_dir = "data", method = "shortest")
+tidy_ref_authors(custom_name, data_dir = "data", method = "shortest")
 }
 \arguments{
-\item{collection}{a collection name}
+\item{custom_name}{a publications list custom name}
 
 \item{data_dir}{the path to data directory}
 
@@ -20,6 +20,6 @@ a tibble
 Description
 }
 \examples{
-data=extract_collection("BIOEENVIS", nmax=200)
+data=extract_publications("BIOEENVIS", nmax=200)
 data_ref_authors=tidy_ref_authors(data)
 }

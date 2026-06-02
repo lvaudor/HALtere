@@ -16,11 +16,16 @@ fluidPage(
                   tags$img(src = "hex-HALtere.png",
                            height = "50px", width = "50px")),
            column(width=3,
-                  checkboxInput("new_collection",
-                                "New collection",
-                                value=FALSE
-                                ),
-                  uiOutput("ui_collection_selection")),
+                  checkboxInput(
+                    "local_data_dir",
+                    "Use my local data",
+                    value = FALSE
+                  ),
+                  uiOutput("ui_root_dir"),
+                  uiOutput("ui_create_dir"),
+                  uiOutput("ui_pub_list_selection"),
+                  textOutput("status")
+           ),
            column(width=2,
                   radioButtons("doctype",
                                "Type of document",
@@ -32,7 +37,7 @@ fluidPage(
                               max = 2025,
                               value=c(2020,2025))),
            column(width=3,
-                  "Exploration des collections HAL par les graphes de collaborations et les fréquences de mots")
+                  "Exploration des publications HAL par les graphes de collaborations et les fréquences de mots")
            ),
   tabsetPanel(
     tabPanel(
@@ -90,8 +95,8 @@ fluidPage(
                           DT::dataTableOutput("table_edges"))
                )#tabsetPanel
         )
-      )
-    ),# tabPanel collaborations
+    )
+  ),# tabPanel collaborations
     tabPanel("Words",
              plotOutput("wordfreq")),
     tabPanel("Words by period",

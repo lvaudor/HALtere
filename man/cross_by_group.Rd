@@ -16,7 +16,7 @@ a tibble
 Description
 }
 \examples{
-data=extract_collection("BIOEENVIS", nmax=+Inf)
+data=extract_publications("BIOEENVIS", nmax=+Inf)
 data_ref_authors=tidy_ref_authors(data)
 data_groups=tidy_groups(data_ref_authors)
 cross_by_group(data_ref_authors \%>\% dplyr::filter(id_ref==1))

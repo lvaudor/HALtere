@@ -2,12 +2,12 @@
 % Please edit documentation in R/cross.R
 \name{cross}
 \alias{cross}
-\title{Description}
+\title{Cross people or labs to quantify number of co-publications}
 \usage{
-cross(collection, data_dir, type = "people")
+cross(custom_name, data_dir, type = "people")
 }
 \arguments{
-\item{collection}{a collection name}
+\item{custom_name}{a publications list custom name}
 
 \item{data_dir}{the path to data directory}
 
@@ -19,8 +19,8 @@ cross(collection, data_dir, type = "people")
 a tibble which crosses people or labs to tally number of collaborations
 }
 \description{
-Description
+Cross people or labs to quantify number of co-publications
 }
 \examples{
-HALtere::cross("BIOEENVIS","data", type="people")
+HALtere::cross("BIOEENVIS","data_HALtere", type="people")
 }
