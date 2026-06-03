@@ -6,6 +6,22 @@ library(shiny)
 
 function(input, output, session) {
 
+  volumes <- c(Home = normalizePath("~"))
+
+  shinyFiles::shinyDirChoose(
+    input,
+    id = "dir",
+    roots = volumes,
+    session = session
+  )
+
+  global <- reactiveValues(datapath = getwd())
+
+  output$dir <- renderText({
+    global$datapath
+  })
+
+
   # ---------------------------------------------------------------------------
   # App state
   # ---------------------------------------------------------------------------
@@ -42,14 +58,24 @@ function(input, output, session) {
   # Root directory
   # ---------------------------------------------------------------------------
 
-  r_root_dir <- reactive({
-    print("in r_root_dir")
-    if (!isTRUE(input$local_data_dir)) {
-      return("data_HALtere")
+  selected_dir <- reactive({
+    print("in selected dir")
+    req(input$dir)
+    if(is.integer(input$dir)){
+      return(system.file("data_HALtere", package = "HALtere"))
+    }else{
+      path = shinyFiles::parseDirPath(volumes, input$dir)
+      return(path)
     }
-    req(global$datapath)
-    global$datapath
   })
+
+  r_root_dir <- reactive({
+      print("in r_root_dir()")
+      if (!isTRUE(input$local_data_dir)) {
+        return("data_HALtere")
+      }
+      selected_dir()
+    })
 
   # ---------------------------------------------------------------------------
   # Dataset selection UI
@@ -57,7 +83,7 @@ function(input, output, session) {
 
   output$ui_pub_list_selection <- renderUI({
     print("in ui_pub_list_selection")
-
+    req(rv$state=="ready")
     files_included <- list.files(r_root_dir(), full.names = FALSE)
 
     data_in_dir <- "HALtere_data_directory_README.txt" %in% files_included
@@ -98,24 +124,7 @@ function(input, output, session) {
     }
   })
 
-  # ---------------------------------------------------------------------------
-  # ShinyDir
-  # ---------------------------------------------------------------------------
 
-  shinyFiles::shinyDirChoose(
-    input,
-    "dir",
-    roots = c(home = "~"),
-    filetypes = c("", "txt", "bigWig", "tsv", "csv", "bw")
-  )
-
-  global <- reactiveValues(datapath = getwd())
-
-  dir <- reactive(input$dir)
-
-  output$dir <- renderText({
-    global$datapath
-  })
 
   # ---------------------------------------------------------------------------
   # Create new dataset UI
@@ -136,20 +145,6 @@ function(input, output, session) {
     )
   })
 
-  # ---------------------------------------------------------------------------
-  # Directory selection handler
-  # ---------------------------------------------------------------------------
-
-  observeEvent(input$dir, {
-    if (!"path" %in% names(dir())) return()
-
-    home <- normalizePath("~")
-
-    global$datapath <- file.path(
-      home,
-      paste(unlist(dir()$path[-1]), collapse = .Platform$file.sep)
-    )
-  })
 
   # ---------------------------------------------------------------------------
   # Create dataset
@@ -159,9 +154,9 @@ function(input, output, session) {
     rv$state <- "computing"
 
     data_dir <- r_root_dir()
-
+    print("in computing")
+    print(data_dir)
     tryCatch({
-
       cat(
         "This directory is a HALtere data directory",
         file = glue::glue("{data_dir}/HALtere_data_directory_README.txt")
@@ -186,14 +181,14 @@ function(input, output, session) {
 
   r_selected_dataset <- reactive({
     req(rv$state == "ready")
-
-    selected_dataset <- file.path(
-      r_root_dir(),
-      input$existing_pub_list_name
-    )
-
+    if(is.null(input$existing_pub_list_name)){
+      pub_list_name="BIOEENVIS"
+    }else{
+      pub_list_name=input$existing_pub_list_name
+    }
+    selected_dataset <- file.path(r_root_dir(),pub_list_name)
+    print("in r_selected_dataset")
     print(selected_dataset)
-
     selected_dataset
   })
 
@@ -202,7 +197,8 @@ function(input, output, session) {
       rv$state,
       "no_data" = "Aucun jeu de données sélectionné",
       "computing" = "Génération des données en cours...",
-      "ready" = "Données prêtes",
+      "ready" =
+        "Données prêtes",
       "error" = "Erreur pendant la génération"
     )
 
@@ -357,10 +353,8 @@ function(input, output, session) {
   # ---------------------------------------------------------------------------
 
   r_get_graph <- reactive({
-
     data_crossed <- r_get_data_crossed()
     data_groups <- r_get_data_groups()
-
     build_network(
       data_crossed = data_crossed,
       data_groups = data_groups,

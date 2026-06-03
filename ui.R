@@ -29,7 +29,7 @@ fluidPage(
            column(width=2,
                   radioButtons("doctype",
                                "Type of document",
-                               c("articles only","all documents"))),
+                               c("all documents","articles only"))),
            column(width=2,
                   sliderInput("years",
                               "years:",

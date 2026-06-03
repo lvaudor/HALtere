@@ -5,15 +5,9 @@
 #' @return a graph
 #' @export
 #' @examples
-#' data=extract_publications("BIOEENVIS", nmax=200)
-#' data_ref_authors=tidy_ref_authors(data)
+#' data_groups=readRDS("data_HALtere/Rencontres_R/data_people.RDS")
+#' data_crossed=readRDS("data_HALtere/Rencontres_R/crossed_people.RDS")
 #'
-#' data_groups=tidy_groups(data_ref_authors,type="people")
-#' data_crossed=HALtere::cross(data_groups)
-#' graph=build_network(data_crossed,data_groups,number_of_nodes=200)
-#'
-#' data_groups=tidy_groups(data_ref_authors,type="labs")
-#' data_crossed=HALtere::cross(data_groups)
 #' graph=build_network(data_crossed,data_groups,number_of_nodes=200)
 #'
 #' plot_network(graph, colorvar="name")
@@ -57,7 +51,8 @@ build_network=function(data_crossed,
     yto=nodes$y[edges$to],
     namefrom=nodes$name[edges$from],
     nameto=nodes$name[edges$to],
-    nlinks=edges$nlinks) %>%
+    nlinks=edges$nlinks)
+  edges=edges %>%
     dplyr::left_join(data_summary,by=c("namefrom"="name"),relationship = "many-to-many") %>%
     dplyr::mutate(hover=glue::glue("{namefrom}-\n{nameto}:\n{nlinks} links")) %>%
     dplyr::mutate(width=round(dplyr::percent_rank(nlinks)*10+0.5)) %>%

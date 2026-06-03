@@ -2,7 +2,8 @@
 #' @param text_to_complete the vector of texts to complete with translated texts (the elements such that whether_to_translate is FALSE are left unchanged)
 #' @param text_to_translate the text to translate
 #' @param whether_to_translate whether or not to translate the text to English (can be FALSE if the text is already in English for instance).
-#' @param long whether the text is long (polyglotr's google_translate_long() function will be used if long is TRUE)
+#' @param long whether the text is long (polyglotr's google_translate_long_text() function will be used if long is TRUE)
+#' @param delay the delay in seconds between two calls to the translation function (to avoid hitting the API too much)
 #' @return a tibble
 #' @export
 #' @examples
@@ -11,7 +12,7 @@
 #' library(dplyr)
 #' tib %>%
 #'   mutate(text_trans=complete_with_translated_texts(text_original,text_original,translate))
-complete_with_translated_texts=function(text_to_complete,text_to_translate,whether_to_translate, long=FALSE){
+complete_with_translated_texts=function(text_to_complete,text_to_translate,whether_to_translate, long=FALSE, delay=2){
 
   resulting_text=text_to_complete
   ind=which(whether_to_translate==TRUE & !is.na(text_to_translate))
@@ -19,8 +20,7 @@ complete_with_translated_texts=function(text_to_complete,text_to_translate,wheth
   if(length(ind)>1){
     for (i in 1:length(ind)){
       if(floor((i-1)/100)==(i-1)/100){
-      Sys.sleep(0.5)
-      print(paste("Translating items ", i,"to",min(length(ind),i+99)))
+      Sys.sleep(delay)
       }
       result=translate_function(text_to_translate[ind[i]],
                          source_language="fr",
