@@ -12,7 +12,7 @@
 #' library(dplyr)
 #' tib %>%
 #'   mutate(text_trans=complete_with_translated_texts(text_original,text_original,translate))
-complete_with_translated_texts=function(text_to_complete,text_to_translate,whether_to_translate, long=FALSE, delay=2){
+complete_with_translated_texts=function(text_to_complete,text_to_translate,whether_to_translate, long=FALSE, delay=0.1){
 
   resulting_text=text_to_complete
   ind=which(whether_to_translate==TRUE & !is.na(text_to_translate))
@@ -20,8 +20,9 @@ complete_with_translated_texts=function(text_to_complete,text_to_translate,wheth
   if(length(ind)>1){
     for (i in 1:length(ind)){
       if(floor((i-1)/100)==(i-1)/100){
-      Sys.sleep(delay)
+        message(glue::glue("Translating text {i} out of {length(ind)}"))
       }
+      Sys.sleep(delay)
       result=translate_function(text_to_translate[ind[i]],
                          source_language="fr",
                          target_language="en") %>%

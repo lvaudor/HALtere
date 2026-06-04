@@ -74,7 +74,6 @@ prepare_all_data <- function(
   ## ---- record_data_ref_authors_people_and_labs -----------------------------
 
   print("DATA_REF_AUTHORS, DATA_PEOPLE, DATA_LABS")
-
   # 1) calculate data_ref_authors
   data_ref_authors <- tidy_ref_authors(
     custom_name,
@@ -132,7 +131,6 @@ prepare_all_data <- function(
   ## ---- text ---------------------------------------------------------------
 
   print("TEXT")
-
   text <- tidy_text(
     custom_name,
     data_dir = data_dir,

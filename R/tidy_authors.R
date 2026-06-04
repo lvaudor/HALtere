@@ -132,14 +132,13 @@ show_ref_authors=function(publications, data_ref_authors){
 
 
 #' Description
-#' @param data_ref_authors a tibble produced with the tidy_ref_authors() function
+#' @param custom_name a publications list custom name
+#' @param data_dir the path to data directory. Defaults to inst/data_HALtere
 #' @return a tibble with all title words
 #' @export
 #' @examples
-#' data=extract_publications("EVS_UMR5600", nmax=50)
-#' data_ref_authors=tidy_ref_authors(data)
-#' data_words=tidy_words(data_)
-tidy_words=function(custom_name, data_dir="data"){
+#' data_words=tidy_words("BIOEENVIS", data_dir="inst/data_HALtere")
+tidy_words=function(custom_name, data_dir="inst/data_HALtere"){
   datapath=glue::glue("{data_dir}/{custom_name}/data_ref_authors.RDS")
   data_ref_authors = readRDS(datapath)
   data(lexicon_en)

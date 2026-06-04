@@ -165,32 +165,26 @@ extract_publications <- function(
   # -----------------------------------------------------------------------
 
   message(glue::glue("Translating {sum(dat$translate_title_s)} titles"))
-
-  dat <- dat |>
-    dplyr::mutate(
-      title_s = complete_with_translated_texts(
-        en_title_s, fr_title_s, translate_title_s
-      )
+  dat=dat %>% dplyr::mutate(title_s=NA)
+  for (i in 1:nrow(dat)){
+    dat$title_s[i]=complete_with_translated_texts(
+      dat$en_title_s[i],
+      dat$fr_title_s[i],
+      dat$translate_title_s[i]
     )
+  }
 
   message(glue::glue("Translating {sum(dat$translate_keyword_s)} keywords"))
-  dat <- dat |>
-    dplyr::mutate(
-      keyword_s = complete_with_translated_texts(
-        en_keyword_s, fr_keyword_s, translate_keyword_s
-      )
+  dat=dat %>% dplyr::mutate(keyword_s=NA)
+  for (i in 1:nrow(dat)){
+    dat$keyword_s[i]=complete_with_translated_texts(
+      dat$en_keyword_s[i],
+      dat$fr_keyword_s[i],
+      dat$translate_keyword_s[i]
     )
+  }
 
   message(glue::glue("Translating {sum(dat$translate_abstract_s)} abstracts"))
-  # dat <- dat |>
-  #   dplyr::mutate(
-  #     abstract_s = complete_with_translated_texts(
-  #       en_abstract_s,
-  #       fr_abstract_s,
-  #       translate_abstract_s,
-  #       long=TRUE
-  #     )
-  #   )
   dat=dat %>% dplyr::mutate(abstract_s=NA)
   for (i in 1:nrow(dat)){
     dat$abstract_s[i]=complete_with_translated_texts(
