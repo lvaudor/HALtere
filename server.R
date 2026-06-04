@@ -6,15 +6,6 @@ library(shiny)
 
 function(input, output, session) {
 
-  volumes <- c(Home = normalizePath("~"))
-
-  shinyFiles::shinyDirChoose(
-    input,
-    id = "dir",
-    roots = volumes,
-    session = session
-  )
-
   global <- reactiveValues(datapath = getwd())
 
   output$dir <- renderText({
@@ -31,51 +22,13 @@ function(input, output, session) {
   )
 
   # ---------------------------------------------------------------------------
-  # Directory selection UI
-  # ---------------------------------------------------------------------------
-
-  output$ui_root_dir <- renderUI({
-    print("in ui_root_dir")
-    if (!isTRUE(input$local_data_dir)) return(NULL)
-
-    tagList(
-      shinyFiles::shinyDirButton(
-        "dir",
-        "Input directory",
-        "Upload",
-        value = ""
-      ),
-      verbatimTextOutput("dir", placeholder = TRUE),
-      checkboxInput(
-        "create_new_dir",
-        "Create new publication list",
-        value = FALSE
-      )
-    )
-  })
-
-  # ---------------------------------------------------------------------------
   # Root directory
   # ---------------------------------------------------------------------------
 
-  selected_dir <- reactive({
-    print("in selected dir")
-    req(input$dir)
-    if(is.integer(input$dir)){
-      return(system.file("data_HALtere", package = "HALtere"))
-    }else{
-      path = shinyFiles::parseDirPath(volumes, input$dir)
-      return(path)
-    }
-  })
 
   r_root_dir <- reactive({
-      print("in r_root_dir()")
-      if (!isTRUE(input$local_data_dir)) {
-        return("data_HALtere")
-      }
-      selected_dir()
-    })
+      system.file("data_HALtere",package="HALtere")
+  })
 
   # ---------------------------------------------------------------------------
   # Dataset selection UI
@@ -83,45 +36,17 @@ function(input, output, session) {
 
   output$ui_pub_list_selection <- renderUI({
     print("in ui_pub_list_selection")
-    req(rv$state=="ready")
     files_included <- list.files(r_root_dir(), full.names = FALSE)
-
-    data_in_dir <- "HALtere_data_directory_README.txt" %in% files_included
-
-    if (!input$local_data_dir) {
-      rv$state <- "ready"
-      montre_donnees <- TRUE
-    }
-
-    if (input$local_data_dir & !data_in_dir) {
-      rv$state <- "no_data"
-      montre_donnees <- FALSE
-    }
-
-    if (input$local_data_dir & data_in_dir) {
-      rv$state <- "ready"
-      montre_donnees <- TRUE
-
-      if ("create_new_dir" %in% names(input)) {
-        if (input$create_new_dir) {
-          rv$state <- "no_data"
-        }
-      }
-    }
-
-    if (rv$state == "ready") {
-      selectInput(
-        "existing_pub_list_name",
-        "Publications de :",
-        choices = list.dirs(
-          r_root_dir(),
-          full.names = FALSE,
-          recursive = FALSE
-        )
+    selectInput(
+      "existing_pub_list_name",
+      "Publications de :",
+      choices = list.dirs(
+        r_root_dir(),
+        full.names = FALSE,
+        recursive = FALSE
       )
-    } else {
-      NULL
-    }
+    )
+
   })
 
 
@@ -132,11 +57,8 @@ function(input, output, session) {
 
   output$ui_create_dir <- renderUI({
     if (!isTRUE(input$create_new_dir)) {
-      rv$state <- "ready"
       return(NULL)
     }
-
-    rv$state <- "no_data"
 
     tagList(
       textInput("new_pub_list_name", "Nom du nouveau répertoire", value = ""),
@@ -150,34 +72,6 @@ function(input, output, session) {
   # Create dataset
   # ---------------------------------------------------------------------------
 
-  observeEvent(input$create_data, {
-    rv$state <- "computing"
-
-    data_dir <- r_root_dir()
-    print("in computing")
-    print(data_dir)
-    tryCatch({
-      cat(
-        "This directory is a HALtere data directory",
-        file = glue::glue("{data_dir}/HALtere_data_directory_README.txt")
-      )
-
-      prepare_all_data(
-        custom_name = input$new_pub_list_name,
-        query = input$pub_list_query,
-        data_dir = data_dir
-      )
-
-      rv$state <- "ready"
-
-    }, error = function(e) {
-      rv$state <- "error"
-    })
-  })
-
-  # ---------------------------------------------------------------------------
-  # Selected dataset
-  # ---------------------------------------------------------------------------
 
   r_selected_dataset <- reactive({
     req(rv$state == "ready")
@@ -192,18 +86,6 @@ function(input, output, session) {
     selected_dataset
   })
 
-  output$status <- renderText({
-    result <- switch(
-      rv$state,
-      "no_data" = "Aucun jeu de données sélectionné",
-      "computing" = "Génération des données en cours...",
-      "ready" =
-        "Données prêtes",
-      "error" = "Erreur pendant la génération"
-    )
-
-    paste(result, r_selected_dataset())
-  })
 
   # ---------------------------------------------------------------------------
   # Ref authors

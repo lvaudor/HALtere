@@ -1,7 +1,8 @@
 #' Prepare line of HALtere directories-related data
 #'
-#' @param query HAL query used to retrieve publications
 #' @param custom_name name to give to the list of publications.
+#' @param query HAL query used to retrieve publications
+#' @param data_dir path to data directory. Defaults to "inst/data_HALtere".
 #' If NA (default) the directory will be named after the query.
 #'
 #' @return one line of dataset regarding a list of publications
@@ -9,13 +10,15 @@
 #'
 #' @examples
 #' prepare_HALtere_directory(
-#'   query='authIdHal_s:"lise-vaudor"',
 #'   custom_name="Lise Vaudor"
+#'   query='authIdHal_s:"lise-vaudor"',
+#'   data_dir="inst/data_HALtere"
 #' )
 
 prepare_HALtere_directory <- function(
+    custom_name = NA,
     query,
-    custom_name = NA
+    data_dir="inst/data_HALtere"
 ) {
 
   if (is.na(custom_name)) {
@@ -24,7 +27,8 @@ prepare_HALtere_directory <- function(
 
   data_line <- tibble::tibble(
     custom_name = custom_name,
-    query = query
+    query = query,
+    data_dir=data_dir
   )
 
   return(data_line)
@@ -36,7 +40,7 @@ prepare_HALtere_directory <- function(
 #'
 #' @param custom_name name of the publication list
 #' @param query HAL query used to retrieve publications
-#' @param data_dir root directory where HALtere data sub-directories are kept
+#' @param data_dir root directory where HALtere data sub-directories are kept. Defaults to "inst/data_HALtere"
 #'
 #' @return summary of retrieved datasets
 #' @export
@@ -50,7 +54,7 @@ prepare_HALtere_directory <- function(
 prepare_all_data <- function(
     custom_name,
     query,
-    data_dir = "data_HALtere"
+    data_dir = "inst/data_HALtere"
 ) {
 
   print(paste("PUBLICATIONS LIST:", custom_name))
@@ -139,6 +143,7 @@ prepare_all_data <- function(
 
   result <- paste0(
     "For publications ", custom_name, ", \n",
+    "Saved in directory: ", data_dir, "/", custom_name, "\n",
     n1, " publications were collected, corresponding to:\n",
     n2, " references*authors,\n",
     n3, " words metadata,\n",
@@ -155,6 +160,6 @@ prepare_all_data <- function(
       "{data_dir}/{custom_name}/last_modif.txt"
     )
   )
-
+  message(result)
   return(result)
 }

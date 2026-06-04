@@ -18,7 +18,6 @@ Imports:
     mixr,
     plotly,
     polyglotr,
-    shinyFiles,
     tidygraph,
     tidytext
 Depends: 

@@ -182,14 +182,24 @@ extract_publications <- function(
     )
 
   message(glue::glue("Translating {sum(dat$translate_abstract_s)} abstracts"))
-  dat <- dat |>
-    dplyr::mutate(
-      abstract_s = complete_with_translated_texts(
-        en_abstract_s,
-        fr_abstract_s,
-        translate_abstract_s
-      )
+  # dat <- dat |>
+  #   dplyr::mutate(
+  #     abstract_s = complete_with_translated_texts(
+  #       en_abstract_s,
+  #       fr_abstract_s,
+  #       translate_abstract_s,
+  #       long=TRUE
+  #     )
+  #   )
+  dat=dat %>% dplyr::mutate(abstract_s=NA)
+  for (i in 1:nrow(dat)){
+    dat$abstract_s[i]=complete_with_translated_texts(
+      dat$en_abstract_s[i],
+      dat$fr_abstract_s[i],
+      dat$translate_abstract_s[i],
+      long=TRUE
     )
+  }
   # Remove translation flags and old columns, and create a "text" column that unites title, abstract and keywords (this will be useful for the next steps of the project)
   dat <- dat |>
     tidyr::unite("text", keyword_s, abstract_s, title_s, remove = FALSE) |>

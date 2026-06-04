@@ -16,15 +16,7 @@ fluidPage(
                   tags$img(src = "hex-HALtere.png",
                            height = "50px", width = "50px")),
            column(width=3,
-                  checkboxInput(
-                    "local_data_dir",
-                    "Use my local data",
-                    value = FALSE
-                  ),
-                  uiOutput("ui_root_dir"),
-                  uiOutput("ui_create_dir"),
-                  uiOutput("ui_pub_list_selection"),
-                  textOutput("status")
+                  uiOutput("ui_pub_list_selection")
            ),
            column(width=2,
                   radioButtons("doctype",
