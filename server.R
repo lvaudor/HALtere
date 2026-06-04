@@ -433,4 +433,46 @@ function(input, output, session) {
       ggplot2::scale_x_continuous(limits = input$years)
   })
 
+  ## Observe/updates
+
+  ######################"
+  observe({
+    groups_names=r_get_data_groups() %>%
+      dplyr::pull(name) %>%
+      unique()
+    updateSelectInput(session,
+                      "chosen_group",
+                      choices=groups_names,
+                      selected=groups_names[1])
+  })
+  observe({
+    datadir <- r_selected_dataset()
+    publications <- readRDS(glue::glue("{datadir}/publications.RDS"))
+
+    range_years=range(publications$producedDateY_i)
+    updateSliderInput(session,"years",
+                      min=range_years[1],
+                      max=range_years[2],
+                      value=c(range_years[2]-10, range_years[2]))
+  })
+  observeEvent(input$years,{
+    updateSliderInput(session,"cutyear",
+                      min=input$years[1],
+                      max=input$years[2],
+                      value=round(input$years[1]+(input$years[2]-input$years[1])/2))
+  })
+  observeEvent(input$groups,{
+    max_number_of_names=r_get_data_groups() %>% dplyr::pull(name) %>% unique() %>% length()
+    updateSliderInput(session,"number_of_nodes",
+                      min=0,
+                      max=max_number_of_names,
+                      value=min(c(400,max_number_of_names)))
+    updateSliderInput(session,"number_of_names",
+                      min=0,
+                      max=max_number_of_names,
+                      value=min(c(50,max_number_of_names)))
+  })
+
+
+
 }
