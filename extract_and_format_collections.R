@@ -8,39 +8,34 @@ cat(
 )
 
 HALtere_directories <- dplyr::bind_rows(
-
   prepare_HALtere_directory(
     custom_name="BIOEENVIS",
     query = 'collCode_s:"BIOEENVIS"'
   ),
-
   prepare_HALtere_directory(
     custom_name="EVS",
     query = 'collCode_s:"EVS_UMR5600"'
   ),
-
-  # prepare_HALtere_directory(
-  #   query = 'collCode_s:"OSR"'
-  # ),
-
-  # prepare_HALtere_directory(
-  #   query = 'collCode_s:"LEHNA"'
-  # ),
-
   prepare_HALtere_directory(
     custom_name="OHM-Vallée du Rhône",
     query = 'collCode_s:"OHM-VALLEE_DU_RHONE"'
   ),
-
   prepare_HALtere_directory(
     custom_name="DRIIHM",
     query = 'collCode_s:"LABEX-DRIIHM"'
   ),
-
-  # prepare_HALtere_directory(
-  #   custom_name="OneWater",
-  #   query = 'collCode_s:"PEPR_ONEWATER"'
-  # ),
+  prepare_HALtere_directory(
+    custom_name="OneWater",
+    query = 'collCode_s:"PEPR_ONEWATER"'
+  ),
+  prepare_HALtere_directory(
+    custom_name="Packages_R",
+    query = 'title_autocomplete:"R package"'
+  ),
+  prepare_HALtere_directory(
+    custom_name = "OSR",
+    query = 'collCode_s:"OSR"'
+  )
   #
   # prepare_HALtere_directory(
   #   custom_name = "Lise Vaudor",
@@ -60,14 +55,14 @@ HALtere_directories <- dplyr::bind_rows(
   #   custom_name = "GloUrb",
   #   query = 'anrProjectReference_s:"ANR-22-CE03-0005"'
   # ),
-#
-#   prepare_HALtere_directory(custom_name="Rencontres_R",
-#                             query = 'title_autocomplete:"Rencontres R"'
-#                             ),
-  prepare_HALtere_directory(custom_name="Packages_R",
-                            query = 'title_autocomplete:"R package"',
-                            data_dir="inst/data_HALtere"
-  )
+  #
+  # prepare_HALtere_directory(
+  #    custom_name="Rencontres_R",
+  #    query = 'title_autocomplete:"Rencontres R"'
+  # ),
+  # prepare_HALtere_directory(
+  #   query = 'collCode_s:"LEHNA"'
+  # )
 )
 
 for (i in seq_len(nrow(HALtere_directories))) {

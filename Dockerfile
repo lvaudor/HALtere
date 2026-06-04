@@ -17,11 +17,13 @@ RUN Rscript -e 'install.packages("tidyr")'
 RUN Rscript -e 'install.packages("dplyr")'
 RUN Rscript -e 'install.packages("DT")'
 RUN Rscript -e 'install.packages("ggplot2")'
-RUN Rscript -e 'install.packages("remotes")'
 
 RUN mkdir /app
 ADD . /app
 WORKDIR /app
+
+
+RUN R -e 'remotes::install_local()'
 
 EXPOSE 3840
 HEALTHCHECK --interval=1m --timeout=3s CMD wget --no-verbose --tries=1 --spider http://localhost:3840/ || exit 1
