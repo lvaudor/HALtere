@@ -17,6 +17,7 @@ Imports:
     jsonlite,
     plotly,
     polyglotr,
+    textometry,
     tidygraph,
     tidytext
 Depends: 

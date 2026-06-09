@@ -94,13 +94,15 @@ tidy_ref_authors=function(custom_name, data_dir="data", method="shortest"){
 #' Produces a simplified table of ref_authors
 #' @param publications a tibble produced with the extract_publications() function
 #' @param data_ref_authors a tibble produced with the tidy_ref_authors() function
+#' @param yearmin the minimum year to keep in the output table
+#' @param yearmax the maximum year to keep in the output table
 #' @return a tibble with simplified ref_authors information
 #' @export
 #' @examples
 #' data=extract_publications("BIOEENVIS", nmax=200)
 #' data_ref_authors=tidy_ref_authors(data)
 #' show_ref_authors(publications=data, data_ref_authors=data_ref_authors)
-show_ref_authors=function(publications, data_ref_authors){
+show_ref_authors=function(publications, data_ref_authors, yearmin, yearmax){
   data_ref_authors= data_ref_authors %>%
     tidyr::unite("authors",all_of(c("name","affiliation")),sep=" (") %>%
     dplyr::mutate(authors=paste0(authors,")")) %>%
@@ -112,9 +114,9 @@ show_ref_authors=function(publications, data_ref_authors){
     dplyr::ungroup() %>%
     dplyr::select(id_ref,authors)
   publis=publications %>%
-    dplyr::mutate(title=dplyr::case_when(translate_title_s==TRUE~paste0(title_s," (translated)"),TRUE~title_s),
-                  keywords=dplyr::case_when(translate_keyword_s==TRUE~paste0(keyword_s," (translated)"),TRUE~keyword_s),
-                  abstract=dplyr::case_when(translate_keyword_s==TRUE~paste0(abstract_s," (translated)"),TRUE~abstract_s)) %>%
+    dplyr::mutate(title=dplyr::case_when(translate_title_s==TRUE~paste0(title_s," (translated)"),TRUE~en_title_s),
+                  keywords=dplyr::case_when(translate_keyword_s==TRUE~paste0(keyword_s," (translated)"),TRUE~en_keyword_s),
+                  abstract=dplyr::case_when(translate_keyword_s==TRUE~paste0(abstract_s," (translated)"),TRUE~en_abstract_s)) %>%
     dplyr::select(id_ref,
                   title,
                   journal=journalTitle_s,
@@ -123,8 +125,8 @@ show_ref_authors=function(publications, data_ref_authors){
                   keywords,
                   abstract,
                   text) %>%
-    dplyr::filter(year>=input$years[1],
-                  year<=input$years[2]) %>%
+    dplyr::filter(year>=yearmin,
+                  year<=yearmax) %>%
     dplyr::left_join(data_ref_authors) %>%
     unique()
 

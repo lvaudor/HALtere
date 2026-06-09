@@ -13,8 +13,9 @@ library(HALtere)
 # Define UI for application that draws a histogram
 fluidPage(
   fluidRow(column(width=2,
-                  tags$img(src = "hex-HALtere.png",
-                           height = "50px", width = "50px")),
+                  tags$img(src = "hex-HALtere_and_text.png",
+                           height = "100px", width = "260px")
+           ),
            column(width=3,
                   uiOutput("ui_pub_list_selection")
            ),
@@ -27,10 +28,9 @@ fluidPage(
                               "years:",
                               min = 1970,
                               max = 2025,
-                              value=c(2020,2025))),
-           column(width=3,
-                  "Exploration des publications HAL par les graphes de collaborations et les fréquences de mots")
-           ),
+                              value=c(2020,2025)))
+  )
+          ,
   tabsetPanel(
     tabPanel(
       "Collaborations",

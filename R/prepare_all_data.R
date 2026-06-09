@@ -158,6 +158,5 @@ prepare_all_data <- function(
       "{data_dir}/{custom_name}/last_modif.txt"
     )
   )
-  message(result)
-  return(result)
+  cat(result)
 }

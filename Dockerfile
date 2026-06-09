@@ -17,6 +17,7 @@ RUN Rscript -e 'install.packages("tidyr")'
 RUN Rscript -e 'install.packages("dplyr")'
 RUN Rscript -e 'install.packages("DT")'
 RUN Rscript -e 'install.packages("ggplot2")'
+RUN Rscript -e 'install.packages("textometry")'
 
 RUN mkdir /app
 ADD . /app
