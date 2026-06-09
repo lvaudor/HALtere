@@ -128,7 +128,7 @@ extract_publications <- function(
   }
 
   if(nrow(data_result)==0 & file.exists(previous_file)){
-    warning("Failed to retrieve new recordings from HAL API.")
+    return("Failed to retrieve new recordings from HAL API.")
   }
   if(nrow(data_result)==0 & !file.exists(previous_file)){
     stop("Failed to retrieve any recording from HAL API.")
@@ -196,8 +196,7 @@ extract_publications <- function(
   }
   # Remove translation flags and old columns, and create a "text" column that unites title, abstract and keywords (this will be useful for the next steps of the project)
   dat <- dat |>
-    tidyr::unite("text", keyword_s, abstract_s, title_s, remove = FALSE) |>
-    dplyr::select(-starts_with("translate_"))
+    tidyr::unite("text", keyword_s, abstract_s, title_s, remove = FALSE)
 
   # Merge safely with existing file
   if (file.exists(previous_file)) {

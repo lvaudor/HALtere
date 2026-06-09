@@ -27,7 +27,8 @@ function(input, output, session) {
 
 
   r_root_dir <- reactive({
-      system.file("data_HALtere",package="HALtere")
+      #system.file("data_HALtere",package="HALtere")
+      "inst/data_HALtere"
   })
 
   # ---------------------------------------------------------------------------
@@ -39,7 +40,7 @@ function(input, output, session) {
     files_included <- list.files(r_root_dir(), full.names = FALSE)
     selectInput(
       "existing_pub_list_name",
-      "Publications de :",
+      "Publications of :",
       choices = list.dirs(
         r_root_dir(),
         full.names = FALSE,
@@ -98,12 +99,14 @@ function(input, output, session) {
     data_ref_authors <- readRDS(
       glue::glue("{datadir}/data_ref_authors.RDS")
     )
-
     publications <- readRDS(
       glue::glue("{datadir}/publications.RDS")
     )
 
-    result <- show_ref_authors(publications, data_ref_authors)
+    result <- show_ref_authors(publications,
+                               data_ref_authors,
+                               yearmin=input$years[1],
+                               yearmax=input$years[2])
 
     if (input$doctype == "articles only") {
       result <- result %>% dplyr::filter(docType == "ART")
