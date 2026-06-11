@@ -39,7 +39,7 @@ function(input, output, session) {
     print("in ui_pub_list_selection")
     files_included <- list.files(r_root_dir(), full.names = FALSE)
     selectInput(
-      "existing_pub_list_name",
+      "pub_list_name",
       "Publications of :",
       choices = list.dirs(
         r_root_dir(),
@@ -76,10 +76,10 @@ function(input, output, session) {
 
   r_selected_dataset <- reactive({
     req(rv$state == "ready")
-    if(is.null(input$existing_pub_list_name)){
+    if(is.null(input$pub_list_name)){
       pub_list_name="BIOEENVIS"
     }else{
-      pub_list_name=input$existing_pub_list_name
+      pub_list_name=input$pub_list_name
     }
     selected_dataset <- file.path(r_root_dir(),pub_list_name)
     print("in r_selected_dataset")
@@ -138,7 +138,7 @@ function(input, output, session) {
     ) %>%
       dplyr::filter(
         producedDateY_i >= input$years[1] &
-          producedDateY_i <= input$years[2]
+        producedDateY_i <= input$years[2]
       )
 
     data_words <- readRDS(
@@ -464,7 +464,7 @@ function(input, output, session) {
                       max=input$years[2],
                       value=round(input$years[1]+(input$years[2]-input$years[1])/2))
   })
-  observeEvent(input$groups,{
+  observeEvent(input$pub_list_name,{
     max_number_of_names=r_get_data_groups() %>% dplyr::pull(name) %>% unique() %>% length()
     updateSliderInput(session,"number_of_nodes",
                       min=0,
