@@ -69,6 +69,29 @@ L'import des données peut prendre un certain temps, en fonction du nombre de pu
 
 Il est recommandé de faire tourner la fonction `prepare_all_data()` pour chaque liste de publications que l'on souhaite suivre régulièrement, afin de bénéficier de la mise à jour automatique des données (voir ci-dessous).
 
+# Trouver la requête ad hoc à partir du site HAL
+
+Si vous ne savez pas exactement quelle requête formuler pour récupérer les données de HAL, vous avez deux solutions: examiner la documentation de l'API HAL pour comprendre sur quels champs vous souhaitez filtrer/requêter, ou bien vous aider de l'interface de recherche du site HAL pour formuler votre requête. 
+
+Par exemple, si vous souhaitez récupérer les publications qui comprennent "fleuve Rhône" dans n'importe quel champ, vous pouvez faire une recherche sur le site de HAL (https://hal.archives-ouvertes.fr/) en utilisant les champs de recherche disponibles.
+
+Examinez alors l'url, par exemple:
+
+```https://hal.science/search/index?q="fleuve+Rhône"```
+
+Cette url montre que la requête qui vous convient est:
+
+```"fleuve+Rhône"```
+
+Vous pourrez ensuite copier-coller cette requête dans la fonction `prepare_all_data()`.
+
+```{r, eval=FALSE}
+HALtere::prepare_all_data(
+    custom_name="fleuve_Rhone",
+    query = 'fleuve+Rhône'
+)
+```
+
 # Mise à jour des données
 
 Si l'on refait tourner la fonction `prepare_all_data()` pour un même répertoire (custom_name) sans l'avoir supprimé au préalable, les **données seront mises à jour** en récupérant et traitant **uniquement les publications dans HAL ayant été modifiées depuis le dernier import**. Il est recommandé de conserver les données dans le répertoire pour les listes de publications que l'on souhaite suivre régulièrement, afin de bénéficier de cette mise à jour automatique (le processus de mise à jour est plus rapide que le processus d'import initial, qui traite un grand nombre de publications et qui peut prendre un certain temps).
